@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0D1B2A" />
+  <title>Raquib | رقيب - Smart Cold Chain Monitoring</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="navbar">
+      <div class="container navbar-inner">
+        <a class="brand" href="#home" aria-label="Raquib رقيب">
+          <img class="brand-logo" src="logo.png" alt="Raquib logo" width="44" height="44" />
+          <span>Raquib | رقيب</span>
+        </a>
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#home">الرئيسية</a>
+          <a href="#solutions" data-solution-target="services">الخدمات</a>
+          <a href="#solutions" data-solution-target="rental">التأجير</a>
+          <button class="btn btn-primary" id="gotoDashboardTop" type="button">لوحة التحكم</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="homeView" class="view active">
+        <section class="hero section-anchor" id="home">
+          <div class="container hero-grid">
+            <div>
+              <div class="eyebrow">مراقبة ذكية لسلاسل الإمداد الحساسة</div>
+              <h1>نراقب، ننبه، نحمي - نظام ذكي لمراقبة سلاسل الإمداد الحساسة</h1>
+              <p>
+                Raquib (رقيب) يضع طبقة مراقبة متقدمة لعمليات النقل المبرد واللوجستيات الدوائية والغذائية.
+                نتابع الحرارة والرطوبة والاهتزاز لحظة بلحظة لنحافظ على سلامة الشحنة من نقطة الانطلاق حتى التسليم.
+              </p>
+              <div class="hero-actions">
+                <button class="btn btn-secondary" id="exploreSolutions" type="button" data-solution-target="services">الخدمات</button>
+                <button class="btn btn-primary" id="openDashboard" type="button">لوحة التحكم</button>
+                <span class="status-pill pill-live">Live Monitoring / مراقبة مباشرة</span>
+              </div>
+            </div>
+
+            <aside class="hero-card" aria-label="Product preview card">
+              <div class="hero-metrics">
+                <div class="mini-panel">
+                  <div class="label">الشحنة الحالية</div>
+                  <div class="value">
+                    <strong id="heroShipmentId">#RQ-000125</strong>
+                    <span class="status-pill pill-purple">AI Assisted</span>
+                  </div>
+                </div>
+                <div class="mini-panel">
+                  <div class="label">درجة الحرارة الآن</div>
+                  <div class="value">
+                    <!-- Week 5: هنا سيتم ربط قيمة درجة الحرارة ببيانات API مباشرة بدل القيمة الثابتة الحالية -->
+                    <strong id="heroTempValue">4°C</strong>
+                    <span class="status-pill pill-safe">Safe / آمن</span>
+                  </div>
+                </div>
+                <div class="mini-panel">
+                  <div class="label">حالة التنبيه</div>
+                  <div class="value">
+                    <strong id="heroAlertValue">0 Alerts</strong>
+                    <span class="status-pill pill-live">All Systems Green</span>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="section section-anchor solutions-section" id="solutions">
+          <div class="container">
+            <div class="section-title section-title-stack">
+              <div>
+                <span class="section-kicker">الخدمات والتأجير</span>
+                <h2>حلول تشغيلية وعتاد مراقبة جاهز للنشر</h2>
+                <p>من مراقبة المخزون الحساس إلى تأجير العتاد الذكي، توفر Raquib مسارات تنفيذ واضحة لفرق التشغيل وسلاسل التبريد.</p>
+              </div>
+
+              <div class="solution-tabs" role="tablist" aria-label="Solution categories">
+                <button class="solution-tab active" type="button" data-solution-tab="services" aria-selected="true">الخدمات</button>
+                <button class="solution-tab" type="button" data-solution-tab="rental" aria-selected="false">التأجير</button>
+              </div>
+            </div>
+
+            <div class="solution-panel active" data-solution-panel="services" role="tabpanel">
+              <div class="solution-grid">
+                <article class="solution-card">
+                  <div class="solution-icon teal">01</div>
+                  <h3>مراقبة فورية للمخزون الحساس</h3>
+                  <p>عرض موحد لحركة المنتجات المبردة داخل المستودعات والمركبات مع رؤية تشغيلية لحظية لفرق المتابعة.</p>
+                </article>
+                <article class="solution-card">
+                  <div class="solution-icon purple">02</div>
+                  <h3>تقارير آلية للامتثال</h3>
+                  <p>تقارير منظمة لقطاعي الأدوية والغذاء تساعد على توثيق الحالة التشغيلية وتسهيل المراجعة والاعتماد.</p>
+                </article>
+                <article class="solution-card">
+                  <div class="solution-icon navy">03</div>
+                  <h3>تنبيهات فورية للمخاطر</h3>
+                  <p>إشعارات فورية عند اكتشاف أي تجاوزات حرارية أو بيئية مع أولوية واضحة للمخاطر المؤثرة على الجودة.</p>
+                </article>
+              </div>
+            </div>
+
+            <div class="solution-panel" data-solution-panel="rental" role="tabpanel">
+              <div class="rental-grid">
+                <article class="rental-card featured">
+                  <div class="rental-head">
+                    <span class="rental-pill">الأكثر طلبًا</span>
+                    <h3>Smart Barcode Scanner</h3>
+                  </div>
+                  <p>قارئ باركود ذكي للاستلام والتسليم والتتبع التشغيلي داخل المستودعات ونقاط الحركة.</p>
+                  <div class="rental-price">ابتداءً من 450 ر.س <span>/ شهر</span></div>
+                </article>
+                <article class="rental-card">
+                  <div class="rental-head">
+                    <span class="rental-pill rental-pill-teal">مراقبة بيئية</span>
+                    <h3>Temperature / Humidity Gateway</h3>
+                  </div>
+                  <p>بوابة حساسات مخصصة للقراءة البيئية المستمرة داخل النقل المبرد والمخازن الحساسة.</p>
+                  <div class="rental-price">ابتداءً من 780 ر.س <span>/ شهر</span></div>
+                </article>
+                <article class="rental-card">
+                  <div class="rental-head">
+                    <span class="rental-pill rental-pill-purple">حزمة تشغيل</span>
+                    <h3>Cold Chain Monitoring Kit</h3>
+                  </div>
+                  <p>حزمة كاملة تشمل وحدات التتبع والقراءة البيئية ولوحة ربط جاهزة لفرق اللوجستيات.</p>
+                  <div class="rental-price">ابتداءً من 1,250 ر.س <span>/ شهر</span></div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="dashboardView" class="view dashboard-view">
+        <div class="container">
+          <div class="dashboard-head">
+            <div>
+              <div class="eyebrow">مركز العمليات</div>
+              <h2>لوحة التحكم التشغيلية - Raquib</h2>
+            </div>
+            <button class="btn btn-ghost" id="backToHome" type="button">الرئيسية</button>
+          </div>
+
+          <div class="dashboard-layout">
+            <aside class="sidebar">
+              <h3>Raquib Control Center</h3>
+              <div class="side-links">
+                <a class="active" href="#">نظرة عامة</a>
+                <a href="#">الشحنات النشطة</a>
+                <a href="#">جدول التنبيهات</a>
+                <a href="#">الإعدادات الفنية</a>
+              </div>
+            </aside>
+
+            <div class="dashboard-main">
+              <section class="kpi-ribbon" aria-label="Summary KPIs">
+                <article class="kpi-card border-purple">
+                  <h4>إجمالي الشحنات</h4>
+                  <div class="metric-value" id="kpiTotalShipments">128</div>
+                  <p class="metric-desc">تتبع إجمالي الحركة التشغيلية عبر العملاء والمناطق المختلفة.</p>
+                </article>
+                <article class="kpi-card border-red">
+                  <h4>التنبيهات النشطة</h4>
+                  <div class="metric-value" id="kpiActiveAlerts">03</div>
+                  <p class="metric-desc">تنبيهات حرجة تحتاج مراجعة فورية من فريق العمليات.</p>
+                </article>
+                <article class="kpi-card border-teal">
+                  <h4>الشحنات الآمنة</h4>
+                  <div class="metric-value" id="kpiSafeShipments">121</div>
+                  <p class="metric-desc">الشحنات التي بقيت ضمن الحدود الحرارية والتشغيلية المسموح بها.</p>
+                </article>
+              </section>
+
+              <section class="dashboard-card">
+                <div class="monitor-head">
+                  <div>
+                    <span class="shipment-tag">الشحنة النشطة الحالية: #RQ-000125</span>
+                  </div>
+                  <span class="status-pill pill-live">Monitoring Live</span>
+                </div>
+
+                <div class="cards-grid">
+                  <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
+                    <div class="card-title">
+                      <h4>Temperature Sensor</h4>
+                      <span class="chip chip-green">Safe / آمن</span>
+                    </div>
+                    <div class="sensor-value" id="tempValue">4°C</div>
+                    <div class="fine-print">حافظة التبريد ضمن النطاق المثالي لنقل المنتجات الحساسة.</div>
+                  </article>
+
+                  <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
+                    <div class="card-title">
+                      <h4>Humidity Sensor</h4>
+                      <span class="chip chip-teal">Stable</span>
+                    </div>
+                    <div class="sensor-value" id="humidityValue">45%</div>
+                    <div class="fine-print">توازن رطوبة مناسب لتقليل أي أثر سلبي على العبوات والمنتجات المبردة.</div>
+                  </article>
+
+                  <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
+                    <div class="card-title">
+                      <h4>Vibration / Shock</h4>
+                      <span class="chip chip-gray">Structural Safety</span>
+                    </div>
+                    <div class="sensor-value" id="vibrationValue">مستقر (0G)</div>
+                    <div class="fine-print">لا توجد صدمات مقلقة على هيكل الشحنة أو حاوية النقل حتى الآن.</div>
+                  </article>
+                </div>
+              </section>
+
+              <section class="chart-card">
+                <div class="monitor-head">
+                  <div>
+                    <h3 style="margin:0 0 8px;">Temperature Trend</h3>
+                    <p class="fine-print" style="margin:0;">يعرض تغير الحرارة عبر الوقت ويبرز آخر قراءة بوضوح.</p>
+                  </div>
+                  <span class="status-pill pill-purple">جاهزية التحليل الذكي</span>
+                </div>
+                <div class="chart-wrap" aria-label="Temperature fluctuation chart">
+                  <div class="chart-summary">
+                    <div class="chart-stat">
+                      <span>القراءة الحالية</span>
+                      <strong id="chartCurrentValue">4°C</strong>
+                    </div>
+                    <div class="chart-stat">
+                      <span>المدى</span>
+                      <strong>3.8° - 4.6°C</strong>
+                    </div>
+                    <div class="chart-stat">
+                      <span>الحالة</span>
+                      <strong class="chart-safe">Stable</strong>
+                    </div>
+                  </div>
+                  <div class="chart-frame">
+                    <svg id="tempChart" class="temperature-chart" viewBox="0 0 960 360" role="img" aria-label="Temperature line chart"></svg>
+                    <div class="chart-tooltip" id="chartTooltip" hidden></div>
+                  </div>
+                  <div class="chart-legend">
+                    <span><i class="legend-dot legend-line"></i>منحنى الحرارة</span>
+                    <span><i class="legend-dot legend-fill"></i>نطاق التشغيل</span>
+                    <span><i class="legend-dot legend-current"></i>آخر قراءة</span>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
