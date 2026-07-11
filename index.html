@@ -244,10 +244,10 @@
               <aside class="sidebar">
                 <h3>Raquib Control Center</h3>
                 <div class="side-links">
-                  <a class="active" href="#">نظرة عامة</a>
-                  <a href="#">الشحنات النشطة</a>
-                  <a href="#">جدول التنبيهات</a>
-                  <a href="#">الإعدادات الفنية</a>
+                  <a class="active" href="#" id="sideLinkOverview">نظرة عامة</a>
+                  <a href="#" id="sideLinkShipments">الشحنات النشطة</a>
+                  <a href="#" id="sideLinkAlerts">جدول التنبيهات</a>
+                  <a href="#" id="sideLinkSettings">الإعدادات الفنية</a>
                   <a href="#downloadApp" id="openDownloadModalSidebar" style="color: var(--accent); font-weight: bold;">تنزيل التطبيق 📱</a>
                 </div>
                 <div id="workerProfileCard" style="margin-top: 24px; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: none;">
@@ -258,7 +258,7 @@
               </aside>
 
               <div class="dashboard-main">
-                <section class="kpi-ribbon" aria-label="Summary KPIs">
+                <section class="kpi-ribbon" id="kpiSection" aria-label="Summary KPIs">
                   <article class="kpi-card border-purple">
                     <h4>إجمالي الشحنات</h4>
                     <div class="metric-value" id="kpiTotalShipments">128</div>
@@ -276,7 +276,7 @@
                   </article>
                 </section>
 
-                <section class="dashboard-card">
+                <section class="dashboard-card" id="sensorsSection">
                   <div class="monitor-head">
                     <div>
                       <span class="shipment-tag" id="activeShipmentTag">الشحنة النشطة الحالية: #RQ-000125</span>
@@ -331,7 +331,7 @@
                   </div>
                 </section>
 
-                <section class="chart-card" style="margin-top: 24px;">
+                <section class="chart-card" id="trendSection" style="margin-top: 24px;">
                   <div class="monitor-head">
                     <div>
                       <h3 style="margin:0 0 8px;">Temperature Trend</h3>
@@ -362,6 +362,30 @@
                       <span><i class="legend-dot legend-line"></i>منحنى الحرارة</span>
                       <span><i class="legend-dot legend-fill"></i>نطاق التشغيل</span>
                       <span><i class="legend-dot legend-current"></i>آخر قراءة</span>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Technical Settings Section -->
+                <section class="dashboard-card" id="settingsSection" style="margin-top: 24px; display: none;">
+                  <div class="monitor-head">
+                    <div>
+                      <h3 style="margin:0 0 8px;">الإعدادات الفنية والتشخيص (Technical Settings)</h3>
+                      <p class="fine-print" style="margin:0;">عرض حالة الاتصال بالخادم، إعدادات الـ API، والتشخيص التشغيلي للنظام.</p>
+                    </div>
+                    <span class="status-pill pill-live">System Diagnostic</span>
+                  </div>
+                  <div class="settings-grid" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    <div class="settings-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--stroke); padding: 18px; border-radius: 16px;">
+                      <h5 style="margin:0 0 10px; color: var(--primary); font-size: 1rem;">حالة الاتصال بالـ Backend</h5>
+                      <p style="margin:0 0 8px; font-size: 0.9rem; color: var(--muted);">Endpoint: <code id="settingsApiUrl" style="color: var(--accent);">https://raquib-api.alghzwanyk7.workers.dev</code></p>
+                      <span class="status-pill pill-live" style="background: rgba(16,185,129,0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.2); font-weight: bold;">متصل بالخادم الحي / Connected</span>
+                    </div>
+                    <div class="settings-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--stroke); padding: 18px; border-radius: 16px;">
+                      <h5 style="margin:0 0 10px; color: var(--primary); font-size: 1rem;">تفاصيل الجلسة النشطة</h5>
+                      <p style="margin:0 0 6px; font-size: 0.9rem; color: var(--muted);">نوع المصادقة: <strong style="color: var(--primary);">JWT Bearer</strong></p>
+                      <p style="margin:0 0 6px; font-size: 0.9rem; color: var(--muted);">صلاحية الجلسة: <strong style="color: var(--success);">نشطة (Active)</strong></p>
+                      <p style="margin:0; font-size: 0.9rem; color: var(--muted);">التخزين المحلي: <strong style="color: var(--primary);">LocalStorage Enabled</strong></p>
                     </div>
                   </div>
                 </section>

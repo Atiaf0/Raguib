@@ -718,3 +718,79 @@ if (refreshPairingQrBtn) {
 	refreshPairingQrBtn.addEventListener('click', startPairingSession);
 }
 
+// 4. Dashboard Sidebar Sub-view Navigation
+const sideLinkOverview = document.getElementById('sideLinkOverview');
+const sideLinkShipments = document.getElementById('sideLinkShipments');
+const sideLinkAlerts = document.getElementById('sideLinkAlerts');
+const sideLinkSettings = document.getElementById('sideLinkSettings');
+
+const kpiSection = document.getElementById('kpiSection');
+const sensorsSection = document.getElementById('sensorsSection');
+const alertsSection = document.getElementById('alertsSection');
+const trendSection = document.getElementById('trendSection');
+const settingsSection = document.getElementById('settingsSection');
+
+const allSideLinks = [sideLinkOverview, sideLinkShipments, sideLinkAlerts, sideLinkSettings];
+
+function activateSideLink(activeLink) {
+	allSideLinks.forEach(link => {
+		if (link) link.classList.toggle('active', link === activeLink);
+	});
+}
+
+if (sideLinkOverview) {
+	sideLinkOverview.addEventListener('click', (e) => {
+		e.preventDefault();
+		activateSideLink(sideLinkOverview);
+		
+		// Overview shows everything except settings
+		if (kpiSection) kpiSection.style.display = 'grid';
+		if (sensorsSection) sensorsSection.style.display = 'block';
+		if (alertsSection) alertsSection.style.display = 'block';
+		if (trendSection) trendSection.style.display = 'block';
+		if (settingsSection) settingsSection.style.display = 'none';
+	});
+}
+
+if (sideLinkShipments) {
+	sideLinkShipments.addEventListener('click', (e) => {
+		e.preventDefault();
+		activateSideLink(sideLinkShipments);
+		
+		// Shipments shows active sensor cards and trend graph
+		if (kpiSection) kpiSection.style.display = 'none';
+		if (sensorsSection) sensorsSection.style.display = 'block';
+		if (alertsSection) alertsSection.style.display = 'none';
+		if (trendSection) trendSection.style.display = 'block';
+		if (settingsSection) settingsSection.style.display = 'none';
+	});
+}
+
+if (sideLinkAlerts) {
+	sideLinkAlerts.addEventListener('click', (e) => {
+		e.preventDefault();
+		activateSideLink(sideLinkAlerts);
+		
+		// Alerts shows only the alerts section
+		if (kpiSection) kpiSection.style.display = 'none';
+		if (sensorsSection) sensorsSection.style.display = 'none';
+		if (alertsSection) alertsSection.style.display = 'block';
+		if (trendSection) trendSection.style.display = 'none';
+		if (settingsSection) settingsSection.style.display = 'none';
+	});
+}
+
+if (sideLinkSettings) {
+	sideLinkSettings.addEventListener('click', (e) => {
+		e.preventDefault();
+		activateSideLink(sideLinkSettings);
+		
+		// Settings shows only the technical settings panel
+		if (kpiSection) kpiSection.style.display = 'none';
+		if (sensorsSection) sensorsSection.style.display = 'none';
+		if (alertsSection) alertsSection.style.display = 'none';
+		if (trendSection) trendSection.style.display = 'none';
+		if (settingsSection) settingsSection.style.display = 'block';
+	});
+}
+
