@@ -22,6 +22,7 @@
           <a href="#home">الرئيسية</a>
           <a href="#solutions" data-solution-target="services">الخدمات</a>
           <a href="#solutions" data-solution-target="rental">التأجير</a>
+          <a href="#downloadApp" id="openDownloadModalBtn">تطبيق الهاتف 📱</a>
           <button class="btn btn-primary" id="gotoDashboardTop" type="button">لوحة التحكم</button>
         </nav>
       </div>
@@ -137,6 +138,37 @@
                 </article>
               </div>
             </div>
+        </section>
+
+        <!-- Persistent Glassmorphism Download Section -->
+        <section class="download-section section-anchor" id="downloadAppSection">
+          <div class="container">
+            <div class="download-card-glass">
+              <div class="download-info">
+                <span class="badge-accent">تطبيق الهاتف / Mobile App</span>
+                <h2>حمّل تطبيق رقيب للتشغيل الميداني</h2>
+                <p>
+                  تابع شحناتك البيئية وحل التنبيهات الحرجة مباشرة من الميدان. يتميز التطبيق بمسح سريع للباركود، تنبيهات فورية، ودعم كامل للغتين العربية والإنجليزية.
+                </p>
+                <div class="download-actions">
+                  <a href="https://expo.dev/artifacts/eas/Gh02Zgj9vIanIFRf4WYwy9UChjLPdNyJVlQ-uxuocQE.apk" class="btn btn-primary btn-sky-neon">
+                    <span>📥</span> تنزيل ملف الـ APK للأندرويد
+                  </a>
+                  <a href="https://expo.dev/accounts/kmg001/projects/raquib-app/builds/c88403f0-5d8a-4ef6-9b4f-679253f70610" target="_blank" class="btn btn-ghost" style="color: white; border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <span>⚙️</span> تفاصيل البناء على Expo
+                  </a>
+                </div>
+              </div>
+              <div class="download-qr">
+                <h5>امسح للتثبيت المباشر</h5>
+                <div class="qr-glow-wrapper">
+                  <div class="qr-install-box-glass">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=0f172a&data=https://expo.dev/artifacts/eas/Gh02Zgj9vIanIFRf4WYwy9UChjLPdNyJVlQ-uxuocQE.apk" alt="APK QR Code" />
+                  </div>
+                </div>
+                <p class="qr-hint-text">يدعم أجهزة الأندرويد 8.0 فما فوق</p>
+              </div>
+            </div>
           </div>
         </section>
       </section>
@@ -148,116 +180,236 @@
               <div class="eyebrow">مركز العمليات</div>
               <h2>لوحة التحكم التشغيلية - Raquib</h2>
             </div>
-            <button class="btn btn-ghost" id="backToHome" type="button">الرئيسية</button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button class="btn btn-ghost" id="backToHome" type="button">الرئيسية</button>
+              <button class="btn btn-ghost" id="logoutBtn" type="button" style="display: none; background: rgba(239, 68, 68, 0.1); color: #EF4444; font-weight: bold; border-radius: 12px; padding: 10px 14px;">تسجيل الخروج</button>
+            </div>
           </div>
 
-          <div class="dashboard-layout">
-            <aside class="sidebar">
-              <h3>Raquib Control Center</h3>
-              <div class="side-links">
-                <a class="active" href="#">نظرة عامة</a>
-                <a href="#">الشحنات النشطة</a>
-                <a href="#">جدول التنبيهات</a>
-                <a href="#">الإعدادات الفنية</a>
+          <!-- Login Panel -->
+          <div id="loginPanel" class="login-panel-container">
+            <div class="login-card">
+              <h3>تسجيل الدخول لمركز العمليات</h3>
+              
+              <!-- Login Tabs -->
+              <div class="login-tabs">
+                <button class="login-tab-btn active" id="tabBarcodeBtn" type="button">رمز الموظف</button>
+                <button class="login-tab-btn" id="tabQrBtn" type="button">الدخول السريع بالهاتف</button>
               </div>
-            </aside>
 
-            <div class="dashboard-main">
-              <section class="kpi-ribbon" aria-label="Summary KPIs">
-                <article class="kpi-card border-purple">
-                  <h4>إجمالي الشحنات</h4>
-                  <div class="metric-value" id="kpiTotalShipments">128</div>
-                  <p class="metric-desc">تتبع إجمالي الحركة التشغيلية عبر العملاء والمناطق المختلفة.</p>
-                </article>
-                <article class="kpi-card border-red">
-                  <h4>التنبيهات النشطة</h4>
-                  <div class="metric-value" id="kpiActiveAlerts">03</div>
-                  <p class="metric-desc">تنبيهات حرجة تحتاج مراجعة فورية من فريق العمليات.</p>
-                </article>
-                <article class="kpi-card border-teal">
-                  <h4>الشحنات الآمنة</h4>
-                  <div class="metric-value" id="kpiSafeShipments">121</div>
-                  <p class="metric-desc">الشحنات التي بقيت ضمن الحدود الحرارية والتشغيلية المسموح بها.</p>
-                </article>
-              </section>
-
-              <section class="dashboard-card">
-                <div class="monitor-head">
-                  <div>
-                    <span class="shipment-tag">الشحنة النشطة الحالية: #RQ-000125</span>
+              <!-- Barcode Login Tab Content -->
+              <div id="tabBarcodeContent" class="login-tab-content active">
+                <p>أدخل رمز الموظف (Barcode) الخاص بك للاتصال بالنظام الحي ومتابعة الشحنات وتسوية التنبيهات.</p>
+                <form id="loginForm">
+                  <div class="form-group">
+                    <label for="employeeBarcode" style="display: block; margin-bottom: 8px; font-weight: bold;">رمز الموظف (مثال: EMP-101)</label>
+                    <input type="text" id="employeeBarcode" class="form-input" placeholder="EMP-101" required style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--stroke); background: white; font-size: 1rem; color: var(--primary);" />
                   </div>
-                  <span class="status-pill pill-live">Monitoring Live</span>
-                </div>
+                  <div id="loginError" class="login-error" style="display: none; color: var(--danger); margin-top: 10px; font-size: 0.9rem; font-weight: 500;">رمز الموظف غير صحيح، يرجى المحاولة مرة أخرى.</div>
+                  <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px; justify-content: center;">تسجيل الدخول للبيانات الحية</button>
+                </form>
+              </div>
 
-                <div class="cards-grid">
-                  <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
-                    <div class="card-title">
-                      <h4>Temperature Sensor</h4>
-                      <span class="chip chip-green">Safe / آمن</span>
-                    </div>
-                    <div class="sensor-value" id="tempValue">4°C</div>
-                    <div class="fine-print">حافظة التبريد ضمن النطاق المثالي لنقل المنتجات الحساسة.</div>
+              <!-- QR Code Pairing Login Tab Content -->
+              <div id="tabQrContent" class="login-tab-content">
+                <p>افتح تطبيق رقيب على هاتفك، انتقل لشاشة المسح (Scan)، وامسح كود الـ QR أدناه لتسجيل الدخول فوراً.</p>
+                <div class="qr-pairing-box">
+                  <div id="qrLoadingSpinner" class="qr-spinner">
+                    <div class="spinner-ring"></div>
+                    <span>جاري توليد الرمز...</span>
+                  </div>
+                  <img id="pairingQrImg" class="pairing-qr-img" src="" alt="Pairing QR Code" style="display: none;" />
+                  <div id="qrExpiredMsg" class="qr-expired-msg" style="display: none;">
+                    <span>انتهت صلاحية الرمز</span>
+                    <button class="btn btn-ghost" id="refreshPairingQrBtn" type="button" style="margin-top: 8px; border: 1px solid var(--accent); padding: 6px 12px; font-size: 0.85rem;">تحديث الكود</button>
+                  </div>
+                </div>
+                <div class="qr-pairing-status" id="qrPairingStatus">
+                  <span class="status-indicator-dot dot-pulse"></span>
+                  <span id="qrStatusText">بانتظار المسح من الهاتف...</span>
+                </div>
+                <div id="qrCountdownContainer" style="margin-top: 14px; text-align: center; font-size: 0.95rem; font-weight: bold; color: var(--accent); display: none;">
+                  تنتهي صلاحية الكود خلال: <span id="qrCountdown">05:00</span>
+                </div>
+              </div>
+
+              <div class="login-demo-notice" style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--muted);">
+                أو يمكنك الاستمرار في تصفح <a href="#" id="useDemoData" style="color: var(--accent); font-weight: bold; text-decoration: underline;">البيانات التجريبية</a> دون تسجيل دخول.
+              </div>
+            </div>
+          </div>
+
+          <div id="dashboardContent" style="display: none;">
+            <div class="dashboard-layout">
+              <aside class="sidebar">
+                <h3>Raquib Control Center</h3>
+                <div class="side-links">
+                  <a class="active" href="#">نظرة عامة</a>
+                  <a href="#">الشحنات النشطة</a>
+                  <a href="#">جدول التنبيهات</a>
+                  <a href="#">الإعدادات الفنية</a>
+                  <a href="#downloadApp" id="openDownloadModalSidebar" style="color: var(--accent); font-weight: bold;">تنزيل التطبيق 📱</a>
+                </div>
+                <div id="workerProfileCard" style="margin-top: 24px; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: none;">
+                  <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px;">الموظف المتصل:</div>
+                  <div id="connectedWorkerName" style="font-weight: bold; font-size: 1rem; color: white;">-</div>
+                  <div id="connectedWorkerRole" style="font-size: 0.8rem; color: var(--accent); margin-top: 2px;">-</div>
+                </div>
+              </aside>
+
+              <div class="dashboard-main">
+                <section class="kpi-ribbon" aria-label="Summary KPIs">
+                  <article class="kpi-card border-purple">
+                    <h4>إجمالي الشحنات</h4>
+                    <div class="metric-value" id="kpiTotalShipments">128</div>
+                    <p class="metric-desc">تتبع إجمالي الحركة التشغيلية عبر العملاء والمناطق المختلفة.</p>
                   </article>
-
-                  <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
-                    <div class="card-title">
-                      <h4>Humidity Sensor</h4>
-                      <span class="chip chip-teal">Stable</span>
-                    </div>
-                    <div class="sensor-value" id="humidityValue">45%</div>
-                    <div class="fine-print">توازن رطوبة مناسب لتقليل أي أثر سلبي على العبوات والمنتجات المبردة.</div>
+                  <article class="kpi-card border-red">
+                    <h4>التنبيهات النشطة</h4>
+                    <div class="metric-value" id="kpiActiveAlerts">03</div>
+                    <p class="metric-desc">تنبيهات حرجة تحتاج مراجعة فورية من فريق العمليات.</p>
                   </article>
-
-                  <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
-                    <div class="card-title">
-                      <h4>Vibration / Shock</h4>
-                      <span class="chip chip-gray">Structural Safety</span>
-                    </div>
-                    <div class="sensor-value" id="vibrationValue">مستقر (0G)</div>
-                    <div class="fine-print">لا توجد صدمات مقلقة على هيكل الشحنة أو حاوية النقل حتى الآن.</div>
+                  <article class="kpi-card border-teal">
+                    <h4>الشحنات الآمنة</h4>
+                    <div class="metric-value" id="kpiSafeShipments">121</div>
+                    <p class="metric-desc">الشحنات التي بقيت ضمن الحدود الحرارية والتشغيلية المسموح بها.</p>
                   </article>
-                </div>
-              </section>
+                </section>
 
-              <section class="chart-card">
-                <div class="monitor-head">
-                  <div>
-                    <h3 style="margin:0 0 8px;">Temperature Trend</h3>
-                    <p class="fine-print" style="margin:0;">يعرض تغير الحرارة عبر الوقت ويبرز آخر قراءة بوضوح.</p>
-                  </div>
-                  <span class="status-pill pill-purple">جاهزية التحليل الذكي</span>
-                </div>
-                <div class="chart-wrap" aria-label="Temperature fluctuation chart">
-                  <div class="chart-summary">
-                    <div class="chart-stat">
-                      <span>القراءة الحالية</span>
-                      <strong id="chartCurrentValue">4°C</strong>
+                <section class="dashboard-card">
+                  <div class="monitor-head">
+                    <div>
+                      <span class="shipment-tag" id="activeShipmentTag">الشحنة النشطة الحالية: #RQ-000125</span>
                     </div>
-                    <div class="chart-stat">
-                      <span>المدى</span>
-                      <strong>3.8° - 4.6°C</strong>
+                    <span class="status-pill pill-live">Monitoring Live</span>
+                  </div>
+
+                  <div class="cards-grid">
+                    <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
+                      <div class="card-title">
+                        <h4>Temperature Sensor</h4>
+                        <span class="chip chip-green" id="tempStatusChip">Safe / آمن</span>
+                      </div>
+                      <div class="sensor-value" id="tempValue">4°C</div>
+                      <div class="fine-print">حافظة التبريد ضمن النطاق المثالي لنقل المنتجات الحساسة.</div>
+                    </article>
+
+                    <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
+                      <div class="card-title">
+                        <h4>Humidity Sensor</h4>
+                        <span class="chip chip-teal" id="humidityStatusChip">Stable</span>
+                      </div>
+                      <div class="sensor-value" id="humidityValue">45%</div>
+                      <div class="fine-print">توازن رطوبة مناسب لتقليل أي أثر سلبي على العبوات والمنتجات المبردة.</div>
+                    </article>
+
+                    <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
+                      <div class="card-title">
+                        <h4>Vibration / Shock</h4>
+                        <span class="chip chip-gray" id="vibrationStatusChip">Structural Safety</span>
+                      </div>
+                      <div class="sensor-value" id="vibrationValue">مستقر (0G)</div>
+                      <div class="fine-print">لا توجد صدمات مقلقة على هيكل الشحنة أو حاوية النقل حتى الآن.</div>
+                    </article>
+                  </div>
+                </section>
+
+                <!-- Alerts Section -->
+                <section class="dashboard-card" id="alertsSection" style="margin-top: 24px;">
+                  <div class="monitor-head">
+                    <div>
+                      <h3 style="margin:0 0 8px;">التنبيهات النشطة والتسوية (Active Alerts & Resolution)</h3>
+                      <p class="fine-print" style="margin:0;">الحالات الحرجة الحالية في المستودع وخطوات العمل المطلوبة لتسويتها.</p>
                     </div>
-                    <div class="chart-stat">
-                      <span>الحالة</span>
-                      <strong class="chart-safe">Stable</strong>
+                    <span class="status-pill pill-live" id="alertsLiveBadge">Live Alert System</span>
+                  </div>
+                  <div id="alertsList" class="alerts-list" style="margin-top: 20px;">
+                    <!-- Dynamic alerts will be inserted here -->
+                    <div class="no-alerts-msg" style="text-align: center; padding: 24px; color: var(--muted); font-weight: 500;">
+                      لا توجد تنبيهات نشطة حالياً. كل الأنظمة مستقرة.
                     </div>
                   </div>
-                  <div class="chart-frame">
-                    <svg id="tempChart" class="temperature-chart" viewBox="0 0 960 360" role="img" aria-label="Temperature line chart"></svg>
-                    <div class="chart-tooltip" id="chartTooltip" hidden></div>
+                </section>
+
+                <section class="chart-card" style="margin-top: 24px;">
+                  <div class="monitor-head">
+                    <div>
+                      <h3 style="margin:0 0 8px;">Temperature Trend</h3>
+                      <p class="fine-print" style="margin:0;">يعرض تغير الحرارة عبر الوقت ويبرز آخر قراءة بوضوح.</p>
+                    </div>
+                    <span class="status-pill pill-purple">جاهزية التحليل الذكي</span>
                   </div>
-                  <div class="chart-legend">
-                    <span><i class="legend-dot legend-line"></i>منحنى الحرارة</span>
-                    <span><i class="legend-dot legend-fill"></i>نطاق التشغيل</span>
-                    <span><i class="legend-dot legend-current"></i>آخر قراءة</span>
+                  <div class="chart-wrap" aria-label="Temperature fluctuation chart">
+                    <div class="chart-summary">
+                      <div class="chart-stat">
+                        <span>القراءة الحالية</span>
+                        <strong id="chartCurrentValue">4°C</strong>
+                      </div>
+                      <div class="chart-stat">
+                        <span>المدى</span>
+                        <strong>3.8° - 4.6°C</strong>
+                      </div>
+                      <div class="chart-stat">
+                        <span>الحالة</span>
+                        <strong class="chart-safe">Stable</strong>
+                      </div>
+                    </div>
+                    <div class="chart-frame">
+                      <svg id="tempChart" class="temperature-chart" viewBox="0 0 960 360" role="img" aria-label="Temperature line chart"></svg>
+                      <div class="chart-tooltip" id="chartTooltip" hidden></div>
+                    </div>
+                    <div class="chart-legend">
+                      <span><i class="legend-dot legend-line"></i>منحنى الحرارة</span>
+                      <span><i class="legend-dot legend-fill"></i>نطاق التشغيل</span>
+                      <span><i class="legend-dot legend-current"></i>آخر قراءة</span>
+                    </div>
                   </div>
-                </div>
-              </section>
+                </section>
+              </div>
             </div>
           </div>
         </div>
       </section>
+        </div>
+      </section>
     </main>
+  </div>
+
+  <!-- App Companion Modal -->
+  <div id="appCompanionModal" class="modal-backdrop">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="closeAppModalBtn" aria-label="Close modal">&times;</button>
+      <div class="modal-header">
+        <img src="logo.png" alt="Raquib Logo" width="56" height="56" style="border-radius: 14px; box-shadow: var(--shadow);" />
+        <div>
+          <h3>تطبيق رقيب للهاتف المحمول</h3>
+          <p class="subtitle">المراقبة البيئية الفورية وحل التنبيهات في جيبك</p>
+        </div>
+      </div>
+      <div class="modal-body-grid">
+        <div class="modal-info-column">
+          <h4>مميزات التطبيق:</h4>
+          <ul class="features-list">
+            <li><span>👁️</span> تتبع الحساسات في المخزن وحالة الشحنات مباشرة.</li>
+            <li><span>⚡</span> استقبال إشعارات فورية بالحالات الطارئة والحرجة.</li>
+            <li><span>📸</span> مسح الباركود باستخدام كاميرا الهاتف لحل التنبيهات وربط الشحنات.</li>
+            <li><span>🌐</span> دعم كامل للغتين العربية والإنجليزية مع وضع ليلي.</li>
+          </ul>
+          <div class="modal-actions" style="margin-top: 24px;">
+            <a href="https://expo.dev/artifacts/eas/Gh02Zgj9vIanIFRf4WYwy9UChjLPdNyJVlQ-uxuocQE.apk" class="btn btn-primary" style="text-decoration: none; display: inline-flex; justify-content: center; gap: 8px;">
+              <span>📥</span> تحميل ملف الـ APK للأندرويد
+            </a>
+          </div>
+        </div>
+        <div class="modal-qr-column">
+          <h5>امسح لتنزيل التطبيق فوراً</h5>
+          <div class="qr-install-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=0f172a&data=https://expo.dev/artifacts/eas/Gh02Zgj9vIanIFRf4WYwy9UChjLPdNyJVlQ-uxuocQE.apk" alt="APK QR Code" />
+          </div>
+          <p class="qr-hint">امسح الكود بكاميرا هاتفك لبدء التثبيت مباشرة.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="script.js" defer></script>
