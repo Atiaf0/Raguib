@@ -794,3 +794,22 @@ if (sideLinkSettings) {
 	});
 }
 
+// Mobile menu toggle logic
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const navLinks = document.getElementById('navLinks');
+
+if (mobileMenuToggle && navLinks) {
+	mobileMenuToggle.addEventListener('click', () => {
+		mobileMenuToggle.classList.toggle('active');
+		navLinks.classList.toggle('active');
+	});
+
+	// Close menu when clicking a link or button
+	navLinks.querySelectorAll('a, button').forEach((link) => {
+		link.addEventListener('click', () => {
+			mobileMenuToggle.classList.remove('active');
+			navLinks.classList.remove('active');
+		});
+	});
+}
+
