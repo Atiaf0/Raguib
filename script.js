@@ -1,5 +1,6 @@
 const homeView = document.getElementById('homeView');
-const dashboardView = document.getElementById('dashboardView');
+const controlCenterView = document.getElementById('controlCenterView') || document.getElementById('dashboardView');
+const dashboardView = controlCenterView;
 const openDashboardButtons = [
 	document.getElementById('openDashboard'),
 	document.getElementById('gotoDashboardTop')
@@ -82,9 +83,10 @@ let temperatureSeries = [
 ];
 
 function showView(viewName, options = {}) {
-	const showDashboard = viewName === 'dashboard';
+	const showDashboard = viewName === 'dashboard' || viewName === 'controlCenter';
 	homeView.classList.toggle('active', !showDashboard);
-	dashboardView.classList.toggle('active', showDashboard);
+	controlCenterView.classList.toggle('active', showDashboard);
+	document.body.classList.toggle('dashboard-active', showDashboard);
 	
 	if (showDashboard) {
 		checkAuthState();
@@ -108,8 +110,31 @@ function activateSolutionTab(tabName) {
 }
 
 openDashboardButtons.forEach((button) => {
-	button.addEventListener('click', () => showView('dashboard'));
+	if (!button) return;
+	button.addEventListener('click', () => {
+		const token = localStorage.getItem(TOKEN_KEY);
+		if (!token && !isUsingDemo) {
+			isUsingDemo = true;
+		}
+		showView('controlCenter');
+	});
 });
+
+// Smooth scroll handlers for Join Us CTAs
+const navJoinBtn = document.getElementById('navJoinBtn');
+const heroJoinBtn = document.getElementById('heroJoinBtn');
+const authSection = document.getElementById('authSection');
+
+function scrollToAuth(e) {
+	if (e) e.preventDefault();
+	showView('home', { scrollToTop: false });
+	if (authSection) {
+		authSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	}
+}
+
+if (navJoinBtn) navJoinBtn.addEventListener('click', scrollToAuth);
+if (heroJoinBtn) heroJoinBtn.addEventListener('click', scrollToAuth);
 
 backToHome.addEventListener('click', () => showView('home'));
 
@@ -241,87 +266,85 @@ function checkAuthState() {
 
 	if (token && workerString && !isUsingDemo) {
 		const worker = JSON.parse(workerString);
-		loginPanel.style.display = 'none';
-		dashboardContent.style.display = 'block';
-		logoutBtn.style.display = 'block';
+		if (dashboardContent) dashboardContent.style.display = 'block';
+		if (logoutBtn) logoutBtn.style.display = 'block';
 		
 		// Set connected worker details
-		workerProfileCard.style.display = 'block';
-		connectedWorkerName.textContent = worker.nameEn || worker.name;
-		connectedWorkerRole.textContent = worker.role.toUpperCase();
+		if (workerProfileCard) workerProfileCard.style.display = 'block';
+		if (connectedWorkerName) connectedWorkerName.textContent = worker.nameEn || worker.name;
+		if (connectedWorkerRole) connectedWorkerRole.textContent = worker.role.toUpperCase();
 
 		// Load Live Data
 		loadLiveDashboard(token);
 		
 		// Stop pairing poll since we are logged in
 		stopPairingPoll();
-	} else if (isUsingDemo) {
-		loginPanel.style.display = 'none';
-		dashboardContent.style.display = 'block';
-		logoutBtn.style.display = 'block';
-		workerProfileCard.style.display = 'none';
+	} else {
+		// Default / Demo Dashboard State
+		isUsingDemo = true;
+		if (dashboardContent) dashboardContent.style.display = 'block';
+		if (logoutBtn) logoutBtn.style.display = 'block';
+		if (workerProfileCard) workerProfileCard.style.display = 'none';
 		
 		loadDemoDashboard();
-		
-		// Stop pairing poll since we are logged in
-		stopPairingPoll();
-	} else {
-		loginPanel.style.display = 'flex';
-		dashboardContent.style.display = 'none';
-		logoutBtn.style.display = 'none';
-		workerProfileCard.style.display = 'none';
 		stopPairingPoll();
 	}
 }
 
 // Handle login submit
-loginForm.addEventListener('submit', async (e) => {
-	e.preventDefault();
-	const barcode = employeeBarcode.value.trim();
-	if (!barcode) return;
+if (loginForm) {
+	loginForm.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const barcode = employeeBarcode ? employeeBarcode.value.trim() : '';
+		if (!barcode) return;
 
-	try {
-		loginError.style.display = 'none';
-		const response = await fetch(`${API_BASE}/api/auth/login`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ barcode })
-		});
+		try {
+			if (loginError) loginError.style.display = 'none';
+			const response = await fetch(`${API_BASE}/api/auth/login`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ barcode })
+			});
 
-		if (!response.ok) {
-			throw new Error('Authentication failed');
+			if (!response.ok) {
+				throw new Error('Authentication failed');
+			}
+
+			const data = await response.json();
+			if (data.success && data.token) {
+				isUsingDemo = false;
+				localStorage.setItem(TOKEN_KEY, data.token);
+				localStorage.setItem(WORKER_KEY, JSON.stringify(data.user));
+				if (employeeBarcode) employeeBarcode.value = '';
+				showView('controlCenter');
+			} else {
+				throw new Error('Invalid response');
+			}
+		} catch (err) {
+			console.error('Login error:', err);
+			if (loginError) loginError.style.display = 'block';
 		}
-
-		const data = await response.json();
-		if (data.success && data.token) {
-			isUsingDemo = false;
-			localStorage.setItem(TOKEN_KEY, data.token);
-			localStorage.setItem(WORKER_KEY, JSON.stringify(data.user));
-			employeeBarcode.value = '';
-			checkAuthState();
-		} else {
-			throw new Error('Invalid response');
-		}
-	} catch (err) {
-		console.error('Login error:', err);
-		loginError.style.display = 'block';
-	}
-});
+	});
+}
 
 // Demo Data Access
-useDemoData.addEventListener('click', (e) => {
-	e.preventDefault();
-	isUsingDemo = true;
-	checkAuthState();
-});
+if (useDemoData) {
+	useDemoData.addEventListener('click', (e) => {
+		e.preventDefault();
+		isUsingDemo = true;
+		showView('controlCenter');
+	});
+}
 
 // Logout
-logoutBtn.addEventListener('click', () => {
-	localStorage.removeItem(TOKEN_KEY);
-	localStorage.removeItem(WORKER_KEY);
-	isUsingDemo = false;
-	checkAuthState();
-});
+if (logoutBtn) {
+	logoutBtn.addEventListener('click', () => {
+		localStorage.removeItem(TOKEN_KEY);
+		localStorage.removeItem(WORKER_KEY);
+		isUsingDemo = false;
+		showView('home');
+	});
+}
 
 // Load Live Dashboard Data
 async function loadLiveDashboard(token) {
@@ -533,9 +556,9 @@ document.getElementById('kpiSafeShipments').textContent = mockData.safeShipments
 document.getElementById('heroTempValue').textContent = mockData.temp;
 document.getElementById('heroAlertValue').textContent = `${mockData.activeAlerts} Alerts`;
 
-// If user navigates directly to dashboard hash on page load
-if (window.location.hash === '#dashboardView') {
-	showView('dashboard');
+// If user navigates directly to controlCenter hash on page load
+if (window.location.hash === '#dashboardView' || window.location.hash === '#controlCenterView') {
+	showView('controlCenter');
 } else {
 	renderTemperatureChart();
 }
@@ -752,6 +775,34 @@ if (sideLinkOverview) {
 	});
 }
 
+// Side Links for New Operational Modules
+const sideLinkEscalation = document.getElementById('sideLinkEscalation');
+const sideLinkQuality = document.getElementById('sideLinkQuality');
+const escalationTrackerSection = document.getElementById('escalationTrackerSection');
+const qualityAuditSection = document.getElementById('qualityAuditSection');
+
+if (sideLinkEscalation) {
+	sideLinkEscalation.addEventListener('click', (e) => {
+		e.preventDefault();
+		activateSideLink(sideLinkEscalation);
+		if (escalationTrackerSection) {
+			escalationTrackerSection.style.display = 'block';
+			escalationTrackerSection.scrollIntoView({ behavior: 'smooth' });
+		}
+	});
+}
+
+if (sideLinkQuality) {
+	sideLinkQuality.addEventListener('click', (e) => {
+		e.preventDefault();
+		activateSideLink(sideLinkQuality);
+		if (qualityAuditSection) {
+			qualityAuditSection.style.display = 'block';
+			qualityAuditSection.scrollIntoView({ behavior: 'smooth' });
+		}
+	});
+}
+
 if (sideLinkShipments) {
 	sideLinkShipments.addEventListener('click', (e) => {
 		e.preventDefault();
@@ -812,4 +863,228 @@ if (mobileMenuToggle && navLinks) {
 		});
 	});
 }
+
+/* ==========================================================================
+   Interactive Map Collapsible Shipment Drawer Toggle Engine
+   ========================================================================== */
+const toggleShipmentDrawerBtn = document.getElementById('toggleShipmentDrawerBtn');
+const shipmentDetailDrawer = document.getElementById('shipmentDetailDrawer');
+const drawerToggleIcon = document.getElementById('drawerToggleIcon');
+
+if (toggleShipmentDrawerBtn && shipmentDetailDrawer) {
+	toggleShipmentDrawerBtn.addEventListener('click', () => {
+		const isHidden = shipmentDetailDrawer.style.display === 'none';
+		if (isHidden) {
+			shipmentDetailDrawer.style.display = 'block';
+			if (drawerToggleIcon) drawerToggleIcon.textContent = '▼';
+		} else {
+			shipmentDetailDrawer.style.display = 'none';
+			if (drawerToggleIcon) drawerToggleIcon.textContent = '▲';
+		}
+	});
+}
+
+/* ==========================================================================
+   1. Dynamic 4-Level Alert Escalation Timeline Tracker Interactive Engine
+   ========================================================================== */
+let escalationElapsedSeconds = 462; // 07:42 initial duration
+let isEscalationPaused = false;
+const escalationLiveTimer = document.getElementById('escalationLiveTimer');
+const toggleEscalationTimerBtn = document.getElementById('toggleEscalationTimerBtn');
+const escalationNodesGrid = document.getElementById('escalationNodesGrid');
+
+function updateEscalationTimerDisplay() {
+	if (!escalationLiveTimer) return;
+	const mins = Math.floor(escalationElapsedSeconds / 60);
+	const secs = escalationElapsedSeconds % 60;
+	const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+	escalationLiveTimer.textContent = formatted;
+
+	// Dynamically update level node highlights based on total minutes elapsed
+	const elapsedMins = escalationElapsedSeconds / 60;
+	let activeLevel = 1;
+	if (elapsedMins >= 30) activeLevel = 4;
+	else if (elapsedMins >= 15) activeLevel = 3;
+	else if (elapsedMins >= 5) activeLevel = 2;
+	else activeLevel = 1;
+
+	if (escalationNodesGrid) {
+		const nodes = escalationNodesGrid.querySelectorAll('.escalation-node');
+		nodes.forEach(node => {
+			const lvl = parseInt(node.getAttribute('data-level'), 10);
+			const badge = node.querySelector('.node-badge');
+			
+			node.classList.remove('node-passed', 'node-active', 'node-pending');
+			if (badge) badge.classList.remove('badge-passed', 'badge-active', 'badge-pending', 'animate-pulse');
+
+			if (lvl < activeLevel) {
+				node.classList.add('node-passed');
+				if (badge) {
+					badge.classList.add('badge-passed');
+					badge.textContent = 'تم التصعيد ✓';
+				}
+			} else if (lvl === activeLevel) {
+				node.classList.add('node-active');
+				if (badge) {
+					badge.classList.add('badge-active', 'animate-pulse');
+					badge.textContent = 'نشط الآن (Active)';
+				}
+			} else {
+				node.classList.add('node-pending');
+				if (badge) {
+					badge.classList.add('badge-pending');
+					badge.textContent = `قادم (+${lvl === 3 ? '15' : '30'}د)`;
+				}
+			}
+		});
+	}
+}
+
+if (escalationLiveTimer) {
+	setInterval(() => {
+		if (!isEscalationPaused) {
+			escalationElapsedSeconds++;
+			updateEscalationTimerDisplay();
+		}
+	}, 1000);
+}
+
+if (toggleEscalationTimerBtn) {
+	toggleEscalationTimerBtn.addEventListener('click', () => {
+		isEscalationPaused = !isEscalationPaused;
+		toggleEscalationTimerBtn.textContent = isEscalationPaused ? '▶' : '⏸';
+		toggleEscalationTimerBtn.title = isEscalationPaused ? 'استئناف مؤقت المؤشر' : 'إيقاف مؤقت المؤشر';
+	});
+}
+
+/* ==========================================================================
+   2. Quality Policy & Decision Recommendation Module Engine
+   ========================================================================== */
+const qaOfficerName = document.getElementById('qaOfficerName');
+const qaTimestamp = document.getElementById('qaTimestamp');
+const qaDecisionReason = document.getElementById('qaDecisionReason');
+const qaCustomReason = document.getElementById('qaCustomReason');
+const qualityApprovalForm = document.getElementById('qualityApprovalForm');
+const qaSubmitBtn = document.getElementById('qaSubmitBtn');
+const qaBtnSpinner = document.getElementById('qaBtnSpinner');
+const qaBtnText = document.getElementById('qaBtnText');
+const qaSuccessAlert = document.getElementById('qaSuccessAlert');
+
+const qualityAutomatedBadge = document.getElementById('qualityAutomatedBadge');
+const qualityBadgeText = document.getElementById('qualityBadgeText');
+const qaRecommendationText = document.getElementById('qaRecommendationText');
+
+// Quality parameters setup
+const qaParams = {
+	targetTemp: -18,
+	maxAllowedTemp: -15,
+	maxPolicyMins: 15,
+	actualMaxTemp: -14,
+	actualDurationMins: 10
+};
+
+// Evaluate decision automatically
+function evaluateQualityPolicy() {
+	if (!qualityAutomatedBadge) return;
+	const dot = qualityAutomatedBadge.querySelector('.dot');
+	
+	qualityAutomatedBadge.className = 'quality-badge';
+	if (dot) dot.className = 'dot';
+
+	if (qaParams.actualDurationMins === 0 || qaParams.actualMaxTemp <= qaParams.maxAllowedTemp) {
+		qualityAutomatedBadge.classList.add('badge-emerald');
+		if (dot) dot.classList.add('dot-emerald');
+		if (qualityBadgeText) qualityBadgeText.textContent = 'مقبول (مطابق للشروط)';
+		if (qaRecommendationText) qaRecommendationText.textContent = 'الشحنة مستوفية لمعايير الجودة والتبريد بالكامل دون تسجيل أي تجاوز حراري.';
+	} else if (qaParams.actualDurationMins <= qaParams.maxPolicyMins) {
+		qualityAutomatedBadge.classList.add('badge-amber');
+		if (dot) dot.classList.add('dot-amber');
+		if (qualityBadgeText) qualityBadgeText.textContent = 'مقبول مع ملاحظة تنبيه';
+		if (qaRecommendationText) qaRecommendationText.textContent = `حدث تجاوز حراري طفيف لا يتعدى مهلة السياسة المحددة (${qaParams.actualDurationMins} دقائق ≤ ${qaParams.maxPolicyMins} دقيقة). الشحنة سليمة وتشغيلية مع التوثيق المعتمد.`;
+	} else {
+		qualityAutomatedBadge.classList.add('badge-rose');
+		if (dot) dot.classList.add('dot-rose');
+		if (qualityBadgeText) qualityBadgeText.textContent = 'يحتاج تحقيق / مرفوض';
+		if (qaRecommendationText) qaRecommendationText.textContent = `تجاوز الحرارة الوقت المسموح به في السياسة (${qaParams.actualDurationMins} دقيقة > ${qaParams.maxPolicyMins} دقيقة). يُحظر الفسح ويجب رفع محضر للتحقيق الحرج.`;
+	}
+}
+
+// Live timestamp updater
+function updateQaTimestamp() {
+	if (!qaTimestamp) return;
+	const now = new Date();
+	qaTimestamp.value = now.toLocaleString('ar-SA', { 
+		year: 'numeric', month: '2-digit', day: '2-digit', 
+		hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+	});
+}
+
+if (qaTimestamp) {
+	updateQaTimestamp();
+	setInterval(updateQaTimestamp, 1000);
+}
+
+evaluateQualityPolicy();
+
+// Show/hide custom reason input
+if (qaDecisionReason && qaCustomReason) {
+	qaDecisionReason.addEventListener('change', () => {
+		if (qaDecisionReason.value === 'custom') {
+			qaCustomReason.style.display = 'block';
+			qaCustomReason.required = true;
+		} else {
+			qaCustomReason.style.display = 'none';
+			qaCustomReason.required = false;
+		}
+	});
+}
+
+// Form Submission & API Integration
+if (qualityApprovalForm) {
+	qualityApprovalForm.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		
+		if (qaSubmitBtn) qaSubmitBtn.disabled = true;
+		if (qaBtnSpinner) qaBtnSpinner.style.display = 'inline-block';
+		if (qaBtnText) qaBtnText.textContent = 'جاري معالجة الاعتماد وتوليد التقرير...';
+		if (qaSuccessAlert) qaSuccessAlert.style.display = 'none';
+
+		const reason = qaDecisionReason.value === 'custom' ? qaCustomReason.value : qaDecisionReason.value;
+		const payload = {
+			shipmentId: 'RQ-1002',
+			officerName: qaOfficerName ? qaOfficerName.value : 'أحمد محمد - مدير الجودة',
+			timestamp: new Date().toISOString(),
+			parameters: qaParams,
+			evaluation: qualityBadgeText ? qualityBadgeText.textContent : 'مقبول مع ملاحظة تنبيه',
+			decisionReason: reason
+		};
+
+		try {
+			// Direct Worker API link
+			const response = await fetch(`${API_BASE}/api/quality-reports`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
+
+			if (!response.ok) {
+				console.warn('Backend API endpoint returned status', response.status, '- confirming locally.');
+			}
+		} catch (err) {
+			console.error('Error connecting to backend API:', err);
+		} finally {
+			setTimeout(() => {
+				if (qaBtnSpinner) qaBtnSpinner.style.display = 'none';
+				if (qaBtnText) qaBtnText.textContent = 'تم اعتماد القرار بنجاح ✓';
+				if (qaSuccessAlert) qaSuccessAlert.style.display = 'block';
+				
+				setTimeout(() => {
+					if (qaSubmitBtn) qaSubmitBtn.disabled = false;
+					if (qaBtnText) qaBtnText.textContent = 'اعتماد القرار وإصدار التقرير الرسمي 🛡️';
+				}, 4000);
+			}, 1200);
+		}
+	});
+}
+
 

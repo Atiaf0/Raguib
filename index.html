@@ -28,7 +28,7 @@
           <a href="#solutions" data-solution-target="services">الخدمات</a>
           <a href="#solutions" data-solution-target="rental">التأجير</a>
           <a href="#downloadApp" id="openDownloadModalBtn">تطبيق الهاتف 📱</a>
-          <button class="btn btn-primary" id="gotoDashboardTop" type="button">لوحة التحكم</button>
+          <a href="#authSection" class="btn btn-primary btn-nav-join" id="navJoinBtn">انضم إلينا 🚀</a>
         </nav>
       </div>
     </header>
@@ -45,8 +45,8 @@
                 نتابع الحرارة والرطوبة والاهتزاز لحظة بلحظة لنحافظ على سلامة الشحنة من نقطة الانطلاق حتى التسليم.
               </p>
               <div class="hero-actions">
+                <a href="#authSection" class="btn btn-primary" id="heroJoinBtn">انضم لمركز العمليات 🚀</a>
                 <button class="btn btn-secondary" id="exploreSolutions" type="button" data-solution-target="services">الخدمات</button>
-                <button class="btn btn-primary" id="openDashboard" type="button">لوحة التحكم</button>
                 <span class="status-pill pill-live">Live Monitoring / مراقبة مباشرة</span>
               </div>
             </div>
@@ -130,7 +130,7 @@
                     <span class="rental-pill rental-pill-teal">مراقبة بيئية</span>
                     <h3>Temperature / Humidity Gateway</h3>
                   </div>
-                  <p>بوابة حساسات مخصصة للقراءة البيئية المستمرة داخل النقل المبرد والمخازن الحساسة.</p>
+                  <p>بوابة حساسات مخصصة للقراءة البيئية المستمرة داخل النقل المبرد والمخازن الحسة.</p>
                   <div class="rental-price">ابتداءً من 780 ر.س <span>/ شهر</span></div>
                 </article>
                 <article class="rental-card">
@@ -143,9 +143,71 @@
                 </article>
               </div>
             </div>
+          </div>
         </section>
 
-        <!-- Persistent Glassmorphism Download Section -->
+        <!-- Registration / Auth Zone -->
+        <section class="section section-anchor auth-section" id="authSection">
+          <div class="container">
+            <div class="section-title section-title-stack">
+              <div>
+                <span class="section-kicker">المصادقة والتسجيل</span>
+                <h2>مركز مصادقة الموظفين والوصول السريع</h2>
+                <p>قم بتسجيل الدخول ببركود الموظف أو المسح السريع بالهاتف للاتصال للنظام الحي ومتابعة الشحنات وتسوية التنبيهات.</p>
+              </div>
+            </div>
+
+            <div id="loginPanel" class="login-panel-container">
+              <div class="login-card">
+                <h3>تسجيل الدخول لمركز العمليات</h3>
+                
+                <div class="login-tabs">
+                  <button class="login-tab-btn active" id="tabBarcodeBtn" type="button">رمز الموظف</button>
+                  <button class="login-tab-btn" id="tabQrBtn" type="button">الدخول السريع بالهاتف</button>
+                </div>
+
+                <div id="tabBarcodeContent" class="login-tab-content active">
+                  <p>أدخل رمز الموظف (Barcode) الخاص بك للاتصال بالنظام الحي ومتابعة الشحنات وتسوية التنبيهات.</p>
+                  <form id="loginForm">
+                    <div class="form-group">
+                      <label for="employeeBarcode" style="display: block; margin-bottom: 8px; font-weight: bold;">رمز الموظف (مثال: EMP-101)</label>
+                      <input type="text" id="employeeBarcode" class="form-input" placeholder="EMP-101" required style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--stroke); background: white; font-size: 1rem; color: var(--primary);" />
+                    </div>
+                    <div id="loginError" class="login-error" style="display: none; color: var(--danger); margin-top: 10px; font-size: 0.9rem; font-weight: 500;">رمز الموظف غير صحيح، يرجى المحاولة مرة أخرى.</div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px; justify-content: center;">تسجيل الدخول للبيانات الحية</button>
+                  </form>
+                </div>
+
+                <div id="tabQrContent" class="login-tab-content">
+                  <p>افتح تطبيق رقيب على هاتفك، انتقل لشاشة المسح (Scan)، وامسح كود الـ QR أدناه لتسجيل الدخول فوراً.</p>
+                  <div class="qr-pairing-box">
+                    <div id="qrLoadingSpinner" class="qr-spinner">
+                      <div class="spinner-ring"></div>
+                      <span>جاري توليد الرمز...</span>
+                    </div>
+                    <img id="pairingQrImg" class="pairing-qr-img" src="" alt="Pairing QR Code" style="display: none;" />
+                    <div id="qrExpiredMsg" class="qr-expired-msg" style="display: none;">
+                      <span>انتهت صلاحية الرمز</span>
+                      <button class="btn btn-ghost" id="refreshPairingQrBtn" type="button" style="margin-top: 8px; border: 1px solid var(--accent); padding: 6px 12px; font-size: 0.85rem;">تحديث الكود</button>
+                    </div>
+                  </div>
+                  <div class="qr-pairing-status" id="qrPairingStatus">
+                    <span class="status-indicator-dot dot-pulse"></span>
+                    <span id="qrStatusText">بانتظار المسح من الهاتف...</span>
+                  </div>
+                  <div id="qrCountdownContainer" style="margin-top: 14px; text-align: center; font-size: 0.95rem; font-weight: bold; color: var(--accent); display: none;">
+                    تنتهي صلاحية الكود خلال: <span id="qrCountdown">05:00</span>
+                  </div>
+                </div>
+
+                <div class="login-demo-notice" style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--muted);">
+                  أو يمكنك استكشاف <a href="#" id="useDemoData" style="color: var(--accent); font-weight: bold; text-decoration: underline;">البيانات التجريبية</a> مباشرة.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="download-section section-anchor" id="downloadAppSection">
           <div class="container">
             <div class="download-card-glass">
@@ -178,12 +240,13 @@
         </section>
       </section>
 
-      <section id="dashboardView" class="view dashboard-view">
+      <!-- Control Center View -->
+      <section id="controlCenterView" class="view dashboard-view">
         <div class="container">
           <div class="dashboard-head">
             <div>
               <div class="eyebrow">مركز العمليات</div>
-              <h2>لوحة التحكم التشغيلية - Raquib</h2>
+              <h2>لوحة التحكم التشغيلية - Raquib Control Center</h2>
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
               <button class="btn btn-ghost" id="backToHome" type="button">الرئيسية</button>
@@ -191,65 +254,14 @@
             </div>
           </div>
 
-          <!-- Login Panel -->
-          <div id="loginPanel" class="login-panel-container">
-            <div class="login-card">
-              <h3>تسجيل الدخول لمركز العمليات</h3>
-              
-              <!-- Login Tabs -->
-              <div class="login-tabs">
-                <button class="login-tab-btn active" id="tabBarcodeBtn" type="button">رمز الموظف</button>
-                <button class="login-tab-btn" id="tabQrBtn" type="button">الدخول السريع بالهاتف</button>
-              </div>
-
-              <!-- Barcode Login Tab Content -->
-              <div id="tabBarcodeContent" class="login-tab-content active">
-                <p>أدخل رمز الموظف (Barcode) الخاص بك للاتصال بالنظام الحي ومتابعة الشحنات وتسوية التنبيهات.</p>
-                <form id="loginForm">
-                  <div class="form-group">
-                    <label for="employeeBarcode" style="display: block; margin-bottom: 8px; font-weight: bold;">رمز الموظف (مثال: EMP-101)</label>
-                    <input type="text" id="employeeBarcode" class="form-input" placeholder="EMP-101" required style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--stroke); background: white; font-size: 1rem; color: var(--primary);" />
-                  </div>
-                  <div id="loginError" class="login-error" style="display: none; color: var(--danger); margin-top: 10px; font-size: 0.9rem; font-weight: 500;">رمز الموظف غير صحيح، يرجى المحاولة مرة أخرى.</div>
-                  <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px; justify-content: center;">تسجيل الدخول للبيانات الحية</button>
-                </form>
-              </div>
-
-              <!-- QR Code Pairing Login Tab Content -->
-              <div id="tabQrContent" class="login-tab-content">
-                <p>افتح تطبيق رقيب على هاتفك، انتقل لشاشة المسح (Scan)، وامسح كود الـ QR أدناه لتسجيل الدخول فوراً.</p>
-                <div class="qr-pairing-box">
-                  <div id="qrLoadingSpinner" class="qr-spinner">
-                    <div class="spinner-ring"></div>
-                    <span>جاري توليد الرمز...</span>
-                  </div>
-                  <img id="pairingQrImg" class="pairing-qr-img" src="" alt="Pairing QR Code" style="display: none;" />
-                  <div id="qrExpiredMsg" class="qr-expired-msg" style="display: none;">
-                    <span>انتهت صلاحية الرمز</span>
-                    <button class="btn btn-ghost" id="refreshPairingQrBtn" type="button" style="margin-top: 8px; border: 1px solid var(--accent); padding: 6px 12px; font-size: 0.85rem;">تحديث الكود</button>
-                  </div>
-                </div>
-                <div class="qr-pairing-status" id="qrPairingStatus">
-                  <span class="status-indicator-dot dot-pulse"></span>
-                  <span id="qrStatusText">بانتظار المسح من الهاتف...</span>
-                </div>
-                <div id="qrCountdownContainer" style="margin-top: 14px; text-align: center; font-size: 0.95rem; font-weight: bold; color: var(--accent); display: none;">
-                  تنتهي صلاحية الكود خلال: <span id="qrCountdown">05:00</span>
-                </div>
-              </div>
-
-              <div class="login-demo-notice" style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--muted);">
-                أو يمكنك الاستمرار في تصفح <a href="#" id="useDemoData" style="color: var(--accent); font-weight: bold; text-decoration: underline;">البيانات التجريبية</a> دون تسجيل دخول.
-              </div>
-            </div>
-          </div>
-
-          <div id="dashboardContent" style="display: none;">
+          <div id="dashboardContent" style="display: block;">
             <div class="dashboard-layout">
               <aside class="sidebar">
                 <h3>Raquib Control Center</h3>
                 <div class="side-links">
                   <a class="active" href="#" id="sideLinkOverview">نظرة عامة</a>
+                  <a href="#" id="sideLinkEscalation">تصعيد التنبيهات 🚨</a>
+                  <a href="#" id="sideLinkQuality">تدقيق الجودة والفسح 🛡️</a>
                   <a href="#" id="sideLinkShipments">الشحنات النشطة</a>
                   <a href="#" id="sideLinkAlerts">جدول التنبيهات</a>
                   <a href="#" id="sideLinkSettings">الإعدادات الفنية</a>
@@ -263,6 +275,179 @@
               </aside>
 
               <div class="dashboard-main">
+                <!-- 1. Dynamic 4-Level Alert Escalation Timeline Tracker -->
+                <section class="dashboard-card escalation-card" id="escalationTrackerSection" style="margin-bottom: 24px;">
+                  <div class="escalation-header">
+                    <div>
+                      <div class="badge-tag tag-rose">
+                        <span class="pulse-dot bg-rose"></span>
+                        <span>تتبع تصعيد التنبيهات الحية</span>
+                      </div>
+                      <h3 className="section-title">مؤشر التصعيد التراكمي للحوادث الحرارية <span class="sub-id">(INC-8842 - الشحنة #RQ-1002)</span></h3>
+                    </div>
+                    <div class="live-ticker-box">
+                      <div class="ticker-info">
+                        <span class="ticker-label">الزمن المنقضي للتجاوز</span>
+                        <span class="ticker-value" id="escalationLiveTimer">07:42</span>
+                      </div>
+                      <button type="button" class="btn-icon-pause" id="toggleEscalationTimerBtn" title="إيقاف / استئناف مؤقت المؤشر">⏸</button>
+                    </div>
+                  </div>
+
+                  <div class="escalation-grid" id="escalationNodesGrid">
+                    <!-- Level 1 -->
+                    <div class="escalation-node node-passed" data-level="1">
+                      <div class="node-top">
+                        <span class="node-icon">🚨</span>
+                        <span class="node-badge badge-passed">تم التصعيد ✓</span>
+                      </div>
+                      <div class="node-body">
+                        <h4>المستوى الأول (فوري)</h4>
+                        <div class="node-time">00:00 - 05:00 د</div>
+                      </div>
+                      <div class="node-footer">
+                        <span class="footer-label">جهات الإشعارات:</span>
+                        <span class="footer-target">السائق + مدير الأسطول + مسؤول الجودة</span>
+                      </div>
+                    </div>
+
+                    <!-- Level 2 -->
+                    <div class="escalation-node node-active" data-level="2">
+                      <div class="node-top">
+                        <span class="node-icon">⚠️</span>
+                        <span class="node-badge badge-active animate-pulse">نشط الآن (Active)</span>
+                      </div>
+                      <div class="node-body">
+                        <h4>المستوى الثاني (+5 دقائق)</h4>
+                        <div class="node-time">+5 دقائق</div>
+                      </div>
+                      <div class="node-footer">
+                        <span class="footer-label">جهات الإشعارات:</span>
+                        <span class="footer-target highlight-rose">مدير العمليات اللوجستية</span>
+                      </div>
+                    </div>
+
+                    <!-- Level 3 -->
+                    <div class="escalation-node node-pending" data-level="3">
+                      <div class="node-top">
+                        <span class="node-icon">⚡</span>
+                        <span class="node-badge badge-pending">قادم (+15د)</span>
+                      </div>
+                      <div class="node-body">
+                        <h4>المستوى الثالث (+15 دقيقة)</h4>
+                        <div class="node-time">+15 دقيقة</div>
+                      </div>
+                      <div class="node-footer">
+                        <span class="footer-label">جهات الإشعارات:</span>
+                        <span class="footer-target">مدير عام الجودة وسلاسل التبريد</span>
+                      </div>
+                    </div>
+
+                    <!-- Level 4 -->
+                    <div class="escalation-node node-pending" data-level="4">
+                      <div class="node-top">
+                        <span class="node-icon">📞</span>
+                        <span class="node-badge badge-pending">قادم (+30د)</span>
+                      </div>
+                      <div class="node-body">
+                        <h4>المستوى الرابع (+30 دقيقة)</h4>
+                        <div class="node-time">+30 دقيقة</div>
+                      </div>
+                      <div class="node-footer">
+                        <span class="footer-label">جهات الإشعارات:</span>
+                        <span class="footer-target">اتصال آلي ذكي + SMS للطوارئ (الخريطة المستقبلية)</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 2. Quality Policy & Decision Recommendation Module -->
+                <section class="dashboard-card quality-audit-card" id="qualityAuditSection" style="margin-bottom: 24px;">
+                  <div class="quality-header">
+                    <div>
+                      <div class="badge-tag tag-sky">
+                        <span class="pulse-dot bg-sky"></span>
+                        <span>وحدة تدقيق الجودة والاعتماد الفني</span>
+                      </div>
+                      <h3>سياسة الجودة وتوصية الفسح النهائي <span class="sub-id">(#RQ-1002)</span></h3>
+                    </div>
+                    <div id="qualityAutomatedBadge" class="quality-badge badge-amber">
+                      <span class="dot dot-amber"></span>
+                      <span id="qualityBadgeText">مقبول مع ملاحظة تنبيه</span>
+                    </div>
+                  </div>
+
+                  <!-- 8px Grid adherence metrics -->
+                  <div class="metrics-grid-8px">
+                    <div class="metric-box">
+                      <span class="metric-lbl">الحرارة المستهدفة</span>
+                      <div class="metric-val text-white" id="qaTargetTemp">-18<span class="unit">°C</span></div>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-lbl">الحد الأقصى المسموح</span>
+                      <div class="metric-val text-amber" id="qaMaxAllowedTemp">-15<span class="unit">°C</span></div>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-lbl">سياسة التجاوز الزمني</span>
+                      <div class="metric-val text-slate" id="qaMaxPolicyMins">15<span class="unit"> دقيقة</span></div>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-lbl">أعلى حرارة مسجلة</span>
+                      <div class="metric-val text-rose" id="qaActualMaxTemp">-14<span class="unit">°C</span></div>
+                    </div>
+                    <div class="metric-box">
+                      <span class="metric-lbl">مدّة التجاوز الفعلية</span>
+                      <div class="metric-val text-sky" id="qaActualDurationMins">10<span class="unit"> دقيقة</span></div>
+                    </div>
+                  </div>
+
+                  <!-- Recommendation Banner -->
+                  <div class="recommendation-banner" id="qaRecommendationBanner">
+                    <div class="rec-icon">🛡️</div>
+                    <div class="rec-content">
+                      <h4>التوصية الآلية للجودة:</h4>
+                      <p id="qaRecommendationText">حدث تجاوز حراري طفيف لا يتعدى مهلة السياسة المحددة (10 دقائق &le; 15 دقيقة). الشحنة سليمة وتشغيلية مع التوثيق المعتمد.</p>
+                    </div>
+                  </div>
+
+                  <!-- Quality Officer Approval Form -->
+                  <form id="qualityApprovalForm" class="quality-form">
+                    <div class="form-row">
+                      <div class="form-field">
+                        <label for="qaOfficerName">اسم مسؤول الجودة</label>
+                        <input type="text" id="qaOfficerName" value="أحمد محمد - مدير الجودة" required class="input-dark" />
+                      </div>
+                      <div class="form-field">
+                        <label for="qaTimestamp">التوقيت والتاريخ التلقائي</label>
+                        <input type="text" id="qaTimestamp" readonly class="input-dark readonly" />
+                      </div>
+                    </div>
+
+                    <div class="form-field">
+                      <label for="qaDecisionReason">سبب القرار وتبرير الفسح</label>
+                      <select id="qaDecisionReason" class="select-dark">
+                        <option value="تجاوز حراري طفيف ضمن مهلة السياسة المعتمدة (أقل من 15 دقيقة)">تجاوز حراري طفيف ضمن مهلة السياسة المعتمدة (أقل من 15 دقيقة)</option>
+                        <option value="تغير طفيف في الحرارة أثناء تفريغ وشحن البضاعة">تغير طفيف في الحرارة أثناء تفريغ وشحن البضاعة</option>
+                        <option value="تم تأكيد سلامة العينات بالتدقيق اليدوي في الحاوية">تم تأكيد سلامة العينات بالتدقيق اليدوي في الحاوية</option>
+                        <option value="تجاوز الحد المسموح به - تم رفض الشحنة وحظر الفسح">تجاوز الحد المسموح به - تم رفض الشحنة وحظر الفسح</option>
+                        <option value="custom">سبب مخصص...</option>
+                      </select>
+                      <textarea id="qaCustomReason" placeholder="اكتب التبرير الفني بالتفصيل..." class="textarea-dark" style="display: none; margin-top: 8px;"></textarea>
+                    </div>
+
+                    <div id="qaSuccessAlert" class="alert-success-box" style="display: none;">
+                      <span>✓ تم تسجيل واعتماد قرار الجودة وإصدار التقرير الرسمي بنجاح.</span>
+                    </div>
+
+                    <div class="form-actions">
+                      <button type="submit" id="qaSubmitBtn" class="btn-sky-action">
+                        <span id="qaBtnSpinner" class="btn-spinner" style="display: none;"></span>
+                        <span id="qaBtnText">اعتماد القرار وإصدار التقرير الرسمي 🛡️</span>
+                      </button>
+                    </div>
+                  </form>
+                </section>
+
                 <section class="kpi-ribbon" id="kpiSection" aria-label="Summary KPIs">
                   <article class="kpi-card border-purple">
                     <h4>إجمالي الشحنات</h4>
@@ -279,6 +464,57 @@
                     <div class="metric-value" id="kpiSafeShipments">121</div>
                     <p class="metric-desc">الشحنات التي بقيت ضمن الحدود الحرارية والتشغيلية المسموح بها.</p>
                   </article>
+                </section>
+
+                <!-- Live Interactive Map Section with Collapsible Shipment Detail Drawer -->
+                <section class="dashboard-card live-map-card" id="liveMapSection" style="margin-bottom: 24px; position: relative; overflow: hidden;">
+                  <div class="monitor-head">
+                    <div>
+                      <h3 style="margin:0 0 4px; color: white;">الخريطة المباشرة وتتبع الأسطول (Live Map & Fleet Tracking)</h3>
+                      <p class="fine-print" style="margin:0; color: #94A3B8;">مراقبة لحظية لمسارات الشاحنات وحالات التبريد على الطريق.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" id="toggleShipmentDrawerBtn" class="btn-drawer-toggle">
+                        <span>📋 تفاصيل الشحنة (RQ-1002)</span>
+                        <span id="drawerToggleIcon">▼</span>
+                      </button>
+                      <span class="status-pill pill-live">GPS Signal Active</span>
+                    </div>
+                  </div>
+
+                  <!-- Map Visualizer Layer -->
+                  <div class="map-visualizer-container" style="position: relative; width: 100%; height: 320px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <!-- SVG Map Routes Visualizer -->
+                    <svg viewBox="0 0 800 320" style="width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(14, 165, 233, 0.1));">
+                      <path d="M 100,220 Q 250,100 400,160 T 700,80" fill="none" stroke="#0EA5E9" stroke-width="3" stroke-dasharray="6 4" />
+                      <circle cx="100" cy="220" r="7" fill="#10B981" />
+                      <circle cx="250" cy="130" r="7" fill="#10B981" />
+                      <circle cx="400" cy="160" r="9" fill="#F59E0B" class="animate-pulse" />
+                      <circle cx="550" cy="120" r="9" fill="#EF4444" class="animate-bounce" />
+                      <circle cx="700" cy="80" r="7" fill="#10B981" />
+                      <!-- Route Labels -->
+                      <text x="90" y="245" fill="#94A3B8" font-size="11" font-family="sans-serif">RQ-1001 (جازان)</text>
+                      <text x="375" y="190" fill="#FBBF24" font-size="11" font-weight="bold" font-family="sans-serif">RQ-1002 (أبو عريش)</text>
+                      <text x="530" y="100" fill="#F87171" font-size="11" font-weight="bold" font-family="sans-serif">RQ-1004 (تنبيه حراري)</text>
+                    </svg>
+
+                    <!-- Non-obscuring Collapsible Side Drawer Component -->
+                    <div id="shipmentDetailDrawer" class="shipment-drawer-collapsed" style="position: absolute; top: 16px; left: 16px; max-width: 320px; background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 12px; padding: 16px; backdrop-filter: blur(16px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 20; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); padding-bottom: 8px;">
+                        <span style="font-size: 0.85rem; font-weight: bold; color: white;">تفاصيل الشحنة #RQ-1002</span>
+                        <span class="badge-active" style="padding: 2px 8px; font-size: 0.7rem;">في الطريق</span>
+                      </div>
+                      <div id="drawerContent" className="space-y-2" style="font-size: 0.8rem; color: #CBD5E1; line-height: 1.6;">
+                        <div style="display: flex; justify-content: space-between;"><span>السائق:</span><strong style="color: white;">أحمد السعيد</strong></div>
+                        <div style="display: flex; justify-content: space-between;"><span>درجة الحرارة:</span><strong style="color: #F87171;">6.2°C (تجاوز)</strong></div>
+                        <div style="display: flex; justify-content: space-between;"><span>الرطوبة النسبية:</span><strong style="color: white;">48%</strong></div>
+                        <div style="display: flex; justify-content: space-between;"><span>حالة الباب:</span><strong style="color: #34D399;">مغلق</strong></div>
+                        <div style="display: flex; justify-content: space-between;"><span>السرعة الحالية:</span><strong style="color: white;">65 كم/س</strong></div>
+                        <div style="display: flex; justify-content: space-between;"><span>الموقع:</span><strong style="color: white;">جازان - أبو عريش</strong></div>
+                        <div style="display: flex; justify-content: space-between;"><span>ETA المتوقع:</span><strong style="color: #38BDF8;">14:35</strong></div>
+                      </div>
+                    </div>
+                  </div>
                 </section>
 
                 <section class="dashboard-card" id="sensorsSection">
@@ -323,14 +559,14 @@
                 <section class="dashboard-card" id="alertsSection" style="margin-top: 24px;">
                   <div class="monitor-head">
                     <div>
-                      <h3 style="margin:0 0 8px;">التنبيهات النشطة والتسوية (Active Alerts & Resolution)</h3>
-                      <p class="fine-print" style="margin:0;">الحالات الحرجة الحالية في المستودع وخطوات العمل المطلوبة لتسويتها.</p>
+                      <h3>التنبيهات النشطة والتسوية (Active Alerts & Resolution)</h3>
+                      <p class="fine-print">الحالات الحرجة الحالية في المستودع وخطوات العمل المطلوبة لتسويتها.</p>
                     </div>
                     <span class="status-pill pill-live" id="alertsLiveBadge">Live Alert System</span>
                   </div>
                   <div id="alertsList" class="alerts-list" style="margin-top: 20px;">
                     <!-- Dynamic alerts will be inserted here -->
-                    <div class="no-alerts-msg" style="text-align: center; padding: 24px; color: var(--muted); font-weight: 500;">
+                    <div class="no-alerts-msg">
                       لا توجد تنبيهات نشطة حالياً. كل الأنظمة مستقرة.
                     </div>
                   </div>
@@ -339,8 +575,8 @@
                 <section class="chart-card" id="trendSection" style="margin-top: 24px;">
                   <div class="monitor-head">
                     <div>
-                      <h3 style="margin:0 0 8px;">Temperature Trend</h3>
-                      <p class="fine-print" style="margin:0;">يعرض تغير الحرارة عبر الوقت ويبرز آخر قراءة بوضوح.</p>
+                      <h3>Temperature Trend</h3>
+                      <p class="fine-print">يعرض تغير الحرارة عبر الوقت ويبرز آخر قراءة بوضوح.</p>
                     </div>
                     <span class="status-pill pill-purple">جاهزية التحليل الذكي</span>
                   </div>
@@ -397,8 +633,6 @@
               </div>
             </div>
           </div>
-        </div>
-      </section>
         </div>
       </section>
     </main>
