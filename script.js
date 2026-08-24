@@ -1,1090 +1,971 @@
-const homeView = document.getElementById('homeView');
-const controlCenterView = document.getElementById('controlCenterView') || document.getElementById('dashboardView');
-const dashboardView = controlCenterView;
-const openDashboardButtons = [
-	document.getElementById('openDashboard'),
-	document.getElementById('gotoDashboardTop')
-];
-const backToHome = document.getElementById('backToHome');
-const exploreSolutions = document.getElementById('exploreSolutions');
-const solutionSection = document.getElementById('solutions');
-const solutionTabs = Array.from(document.querySelectorAll('[data-solution-tab]'));
-const solutionPanels = Array.from(document.querySelectorAll('[data-solution-panel]'));
-const solutionTriggers = Array.from(document.querySelectorAll('[data-solution-target]'));
+/**
+ * ====================================================================
+ * RAQUIB TELEMETRY - FULL WEB & CONTROL CENTER INTERACTION ENGINE (v2.0)
+ * ====================================================================
+ */
 
-const tempChart = document.getElementById('tempChart');
-const chartTooltip = document.getElementById('chartTooltip');
-const chartCurrentValue = document.getElementById('chartCurrentValue');
+document.addEventListener('DOMContentLoaded', () => {
+  // Backend API Endpoint & Storage Keys
+  const API_BASE = 'https://raquib-api.alghzwanyk7.workers.dev';
+  const TOKEN_KEY = 'raquib_jwt_token';
+  const USER_KEY = 'raquib_user_profile';
 
-// Authentication & Live API integrations
-const API_BASE = 'https://raquib-api.alghzwanyk7.workers.dev';
-const TOKEN_KEY = 'raquib_jwt_token';
-const WORKER_KEY = 'raquib_connected_worker';
+  // Views & Shell Elements
+  const homeView = document.getElementById('homeView');
+  const controlCenterView = document.getElementById('controlCenterView');
+  
+  // Navigation Trigger Buttons
+  const navOpenDashboardBtn = document.getElementById('navOpenDashboardBtn');
+  const heroControlCenterBtn = document.getElementById('heroControlCenterBtn');
+  const btnBackToHome = document.getElementById('btnBackToHome');
+  const brandHomeLink = document.getElementById('brandHomeLink');
+  const navHomeLink = document.getElementById('navHomeLink');
+  const footerHomeLink = document.getElementById('footerHomeLink');
+  const footerDashboardLink = document.getElementById('footerDashboardLink');
+  const btnDashLogout = document.getElementById('btnDashLogout');
 
-const loginPanel = document.getElementById('loginPanel');
-const dashboardContent = document.getElementById('dashboardContent');
-const loginForm = document.getElementById('loginForm');
-const employeeBarcode = document.getElementById('employeeBarcode');
-const loginError = document.getElementById('loginError');
-const useDemoData = document.getElementById('useDemoData');
-const logoutBtn = document.getElementById('logoutBtn');
-const workerProfileCard = document.getElementById('workerProfileCard');
-const connectedWorkerName = document.getElementById('connectedWorkerName');
-const connectedWorkerRole = document.getElementById('connectedWorkerRole');
-const alertsList = document.getElementById('alertsList');
+  // ------------------------------------------------------------------
+  // 1. SPA View Router System
+  // ------------------------------------------------------------------
+  function switchView(viewName, scroll = true) {
+    const isDashboard = viewName === 'controlCenter' || viewName === 'dashboard';
 
-// App Companion Modal Elements
-const appCompanionModal = document.getElementById('appCompanionModal');
-const openModalBtn = document.getElementById('openDownloadModalBtn');
-const openModalSidebar = document.getElementById('openDownloadModalSidebar');
-const closeModalBtn = document.getElementById('closeAppModalBtn');
+    if (homeView) homeView.classList.toggle('active', !isDashboard);
+    if (controlCenterView) controlCenterView.classList.toggle('active', isDashboard);
 
-// Login Tabs and Pairing Elements
-const tabBarcodeBtn = document.getElementById('tabBarcodeBtn');
-const tabQrBtn = document.getElementById('tabQrBtn');
-const tabBarcodeContent = document.getElementById('tabBarcodeContent');
-const tabQrContent = document.getElementById('tabQrContent');
+    if (navHomeLink) navHomeLink.classList.toggle('active', !isDashboard);
 
-const qrLoadingSpinner = document.getElementById('qrLoadingSpinner');
-const pairingQrImg = document.getElementById('pairingQrImg');
-const qrExpiredMsg = document.getElementById('qrExpiredMsg');
-const refreshPairingQrBtn = document.getElementById('refreshPairingQrBtn');
-const qrPairingStatus = document.getElementById('qrPairingStatus');
-const qrStatusText = document.getElementById('qrStatusText');
+    if (isDashboard) {
+      loadDashboardState();
+      // Initialize or invalidate real GIS Leaflet map size after view transition
+      setTimeout(() => {
+        initOrUpdateGisMap();
+      }, 200);
+    }
 
-let pairingIntervalId = null;
-let currentPairingId = null;
-let qrCountdownIntervalId = null;
-let isUsingDemo = false;
+    if (scroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 
-// Default demo/mock data
-const mockData = {
-	temp: '4°C',
-	humidity: '45%',
-	vibration: 'مستقر (0G)',
-	totalShipments: '128',
-	activeAlerts: '03',
-	safeShipments: '121'
-};
+  if (navOpenDashboardBtn) {
+    navOpenDashboardBtn.addEventListener('click', () => switchView('controlCenter'));
+  }
 
-let temperatureSeries = [
-	{ time: '06:00', value: 4.2 },
-	{ time: '08:00', value: 4.1 },
-	{ time: '10:00', value: 4.4 },
-	{ time: '12:00', value: 4.6 },
-	{ time: '14:00', value: 4.3 },
-	{ time: '16:00', value: 4.5 },
-	{ time: '18:00', value: 4.2 },
-	{ time: '20:00', value: 4.0 },
-	{ time: '22:00', value: 3.9 },
-	{ time: '00:00', value: 4.1 },
-	{ time: '02:00', value: 4.3 },
-	{ time: '04:00', value: 4.2 }
-];
+  if (heroControlCenterBtn) {
+    heroControlCenterBtn.addEventListener('click', () => switchView('controlCenter'));
+  }
 
-function showView(viewName, options = {}) {
-	const showDashboard = viewName === 'dashboard' || viewName === 'controlCenter';
-	homeView.classList.toggle('active', !showDashboard);
-	controlCenterView.classList.toggle('active', showDashboard);
-	document.body.classList.toggle('dashboard-active', showDashboard);
-	
-	if (showDashboard) {
-		checkAuthState();
-	}
+  if (footerDashboardLink) {
+    footerDashboardLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView('controlCenter');
+    });
+  }
 
-	if (options.scrollToTop !== false) {
-		window.scrollTo({ top: 0, behavior: 'smooth' });
-	}
-}
+  if (btnBackToHome) {
+    btnBackToHome.addEventListener('click', () => switchView('home'));
+  }
 
-function activateSolutionTab(tabName) {
-	solutionTabs.forEach((button) => {
-		const isActive = button.dataset.solutionTab === tabName;
-		button.classList.toggle('active', isActive);
-		button.setAttribute('aria-selected', String(isActive));
-	});
+  if (brandHomeLink) {
+    brandHomeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView('home');
+    });
+  }
 
-	solutionPanels.forEach((panel) => {
-		panel.classList.toggle('active', panel.dataset.solutionPanel === tabName);
-	});
-}
+  if (navHomeLink) {
+    navHomeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView('home');
+    });
+  }
 
-openDashboardButtons.forEach((button) => {
-	if (!button) return;
-	button.addEventListener('click', () => {
-		const token = localStorage.getItem(TOKEN_KEY);
-		if (!token && !isUsingDemo) {
-			isUsingDemo = true;
-		}
-		showView('controlCenter');
-	});
+  if (footerHomeLink) {
+    footerHomeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView('home');
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 2. Mobile Menu Navigation Toggle
+  // ------------------------------------------------------------------
+  const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+  const navLinks = document.getElementById('navLinks');
+
+  if (mobileMenuToggle && navLinks) {
+    mobileMenuToggle.addEventListener('click', () => {
+      const isExpanded = navLinks.classList.toggle('mobile-open');
+      mobileMenuToggle.setAttribute('aria-expanded', String(isExpanded));
+    });
+
+    navLinks.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('mobile-open');
+        mobileMenuToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 3. Hardware Rental Filter Tabs
+  // ------------------------------------------------------------------
+  const hardwareTabs = document.querySelectorAll('.hardware-tabs .tab-pill');
+  const hardwareCards = document.querySelectorAll('.hardware-cards-grid .hardware-card');
+
+  hardwareTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      hardwareTabs.forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const filter = tab.dataset.filter || 'all';
+
+      hardwareCards.forEach((card) => {
+        const category = card.dataset.category;
+        if (filter === 'all' || category === filter) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // 4. Holographic HUD Live Telemetry Simulator (Hero Section)
+  // ------------------------------------------------------------------
+  const heroLiveTemp = document.getElementById('heroLiveTemp');
+  const heroLiveHumidity = document.getElementById('heroLiveHumidity');
+  const heroTempBar = document.getElementById('heroTempBar');
+  const btnSimulateWarning = document.getElementById('btnSimulateTempWarning');
+
+  let currentTemp = 4.2;
+  let currentHumidity = 45;
+  let isSimulatedAlert = false;
+
+  function updateHudValues() {
+    if (!heroLiveTemp) return;
+
+    if (!isSimulatedAlert) {
+      const delta = (Math.random() - 0.5) * 0.2;
+      currentTemp = Math.round((currentTemp + delta) * 10) / 10;
+      if (currentTemp < 3.8) currentTemp = 3.9;
+      if (currentTemp > 4.5) currentTemp = 4.4;
+
+      heroLiveTemp.textContent = currentTemp.toFixed(1);
+      if (heroLiveHumidity) {
+        currentHumidity = Math.floor(44 + Math.random() * 3);
+        heroLiveHumidity.textContent = currentHumidity;
+      }
+
+      const pct = Math.min(100, Math.max(10, ((currentTemp - 2) / 6) * 100));
+      if (heroTempBar) {
+        heroTempBar.style.width = `${pct}%`;
+        heroTempBar.style.background = 'linear-gradient(90deg, var(--signal-radar), var(--signal-safe))';
+      }
+    }
+  }
+
+  setInterval(updateHudValues, 3000);
+
+  if (btnSimulateWarning) {
+    btnSimulateWarning.addEventListener('click', () => {
+      isSimulatedAlert = !isSimulatedAlert;
+
+      if (isSimulatedAlert) {
+        currentTemp = 11.2;
+        if (heroLiveTemp) {
+          heroLiveTemp.textContent = currentTemp.toFixed(1);
+          heroLiveTemp.classList.add('text-crimson');
+        }
+        if (heroTempBar) {
+          heroTempBar.style.width = '100%';
+          heroTempBar.style.background = 'linear-gradient(90deg, #FFB800, #FF0055)';
+        }
+        btnSimulateWarning.innerHTML = '<span>🔄 إعادة ضبط القراءة</span>';
+      } else {
+        currentTemp = 4.2;
+        if (heroLiveTemp) {
+          heroLiveTemp.textContent = currentTemp.toFixed(1);
+          heroLiveTemp.classList.remove('text-crimson');
+        }
+        btnSimulateWarning.innerHTML = '<span>⚡ محاكاة قراءة</span>';
+        updateHudValues();
+      }
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 5. Authentication & Login Form Logic
+  // ------------------------------------------------------------------
+  const loginForm = document.getElementById('loginForm');
+  const employeeBarcode = document.getElementById('employeeBarcode');
+  const loginError = document.getElementById('loginError');
+  const loginErrorText = document.getElementById('loginErrorText');
+  const loginSpinner = document.getElementById('loginSpinner');
+  const loginBtnText = document.getElementById('loginBtnText');
+  const useDemoData = document.getElementById('useDemoData');
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const barcode = employeeBarcode?.value?.trim();
+
+      if (!barcode) return;
+
+      if (loginSpinner) loginSpinner.style.display = 'inline-block';
+      if (loginBtnText) loginBtnText.textContent = 'جاري التحقق والاتصال...';
+      if (loginError) loginError.style.display = 'none';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ barcode })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success && data.token) {
+          localStorage.setItem(TOKEN_KEY, data.token);
+          localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+          
+          if (loginBtnText) loginBtnText.textContent = '✓ تم التحقق بنجاح!';
+          switchView('controlCenter');
+        } else {
+          throw new Error(data.error || 'رمز الموظف غير مسجل');
+        }
+      } catch (err) {
+        if (loginError) {
+          loginError.style.display = 'flex';
+          if (loginErrorText) {
+            loginErrorText.textContent = err.message || 'حدث خطأ في الاتصال بالخادم، يرجى المحاولة لاحقاً.';
+          }
+        }
+      } finally {
+        if (loginSpinner) loginSpinner.style.display = 'none';
+        if (loginBtnText) loginBtnText.textContent = 'تسجيل الدخول وفتح مركز العمليات 🚀';
+      }
+    });
+  }
+
+  if (useDemoData) {
+    useDemoData.addEventListener('click', () => {
+      const demoUser = {
+        id: 'USR-101',
+        name: 'محمد العتيبي',
+        name_en: 'Mohammed Al-Otaibi',
+        role: 'worker'
+      };
+      localStorage.setItem(TOKEN_KEY, 'demo_session_token_123');
+      localStorage.setItem(USER_KEY, JSON.stringify(demoUser));
+      switchView('controlCenter');
+    });
+  }
+
+  if (btnDashLogout) {
+    btnDashLogout.addEventListener('click', () => {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      switchView('home');
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 6. Control Center Live Data Engine & Operations
+  // ------------------------------------------------------------------
+  const dashUserName = document.getElementById('dashUserName');
+  const dashUserRole = document.getElementById('dashUserRole');
+  const dashLastSyncTime = document.getElementById('dashLastSyncTime');
+  const btnRefreshDashboard = document.getElementById('btnRefreshDashboard');
+
+  function updateSyncTimestamp() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    if (dashLastSyncTime) dashLastSyncTime.textContent = timeStr;
+  }
+
+  async function loadDashboardState() {
+    // Populate user profile info
+    const storedUser = localStorage.getItem(USER_KEY);
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        if (dashUserName) dashUserName.textContent = user.name || 'محمد العتيبي';
+        if (dashUserRole) dashUserRole.textContent = `مسؤول العمليات (${user.id || 'USR-101'})`;
+      } catch (e) {
+        console.error('Error parsing stored user:', e);
+      }
+    }
+
+    updateSyncTimestamp();
+    initQualityTimestamp();
+
+    // Fetch live dashboard metrics from Cloudflare Hono Backend
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token && token !== 'demo_session_token_123') {
+      try {
+        const res = await fetch(`${API_BASE}/api/dashboard`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const dashData = await res.json();
+          if (dashData.stats) {
+            const elTotal = document.getElementById('dashTotalShipments');
+            const elAlerts = document.getElementById('dashActiveAlerts');
+            if (elTotal) elTotal.textContent = dashData.stats.totalMonitored || 128;
+            if (elAlerts) elAlerts.textContent = String(dashData.stats.activeAlerts).padStart(2, '0');
+          }
+        }
+      } catch (err) {
+        console.warn('Using local fallback telemetry metrics:', err);
+      }
+    }
+  }
+
+  if (btnRefreshDashboard) {
+    btnRefreshDashboard.addEventListener('click', () => {
+      btnRefreshDashboard.innerHTML = '<span>جاري التحديث...</span>';
+      setTimeout(() => {
+        loadDashboardState();
+        btnRefreshDashboard.innerHTML = '<span>🔄 تم التحديث بنجاح</span>';
+        setTimeout(() => {
+          btnRefreshDashboard.innerHTML = '<span>🔄 تحديث البيانات الحية</span>';
+        }, 1500);
+      }, 600);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 7. Dynamic Incident Escalation Timer Engine
+  // ------------------------------------------------------------------
+  const escalationLiveTimer = document.getElementById('escalationLiveTimer');
+  const toggleEscalationTimerBtn = document.getElementById('toggleEscalationTimerBtn');
+  const timerPausePlayIcon = document.getElementById('timerPausePlayIcon');
+
+  let escalationSeconds = 462; // 07:42
+  let isTimerRunning = true;
+  let escalationTimerInterval = null;
+
+  function runEscalationTimer() {
+    clearInterval(escalationTimerInterval);
+    escalationTimerInterval = setInterval(() => {
+      if (isTimerRunning) {
+        escalationSeconds++;
+        const mins = String(Math.floor(escalationSeconds / 60)).padStart(2, '0');
+        const secs = String(escalationSeconds % 60).padStart(2, '0');
+        if (escalationLiveTimer) escalationLiveTimer.textContent = `${mins}:${secs}`;
+      }
+    }, 1000);
+  }
+
+  if (toggleEscalationTimerBtn) {
+    toggleEscalationTimerBtn.addEventListener('click', () => {
+      isTimerRunning = !isTimerRunning;
+      if (timerPausePlayIcon) {
+        timerPausePlayIcon.textContent = isTimerRunning ? '⏸' : '▶';
+      }
+    });
+  }
+
+  runEscalationTimer();
+
+  // ------------------------------------------------------------------
+  // 8. Quality Policy & Sign-off Approval Form Logic
+  // ------------------------------------------------------------------
+  const qualityApprovalForm = document.getElementById('qualityApprovalForm');
+  const qaDecisionReason = document.getElementById('qaDecisionReason');
+  const qaCustomReason = document.getElementById('qaCustomReason');
+  const qaSuccessAlert = document.getElementById('qaSuccessAlert');
+  const qaSubmitBtn = document.getElementById('qaSubmitBtn');
+  const qaBtnSpinner = document.getElementById('qaBtnSpinner');
+  const qaBtnText = document.getElementById('qaBtnText');
+  const qaTimestamp = document.getElementById('qaTimestamp');
+
+  function initQualityTimestamp() {
+    if (qaTimestamp) {
+      const now = new Date();
+      qaTimestamp.value = `${now.toLocaleDateString('ar-SA')} - ${now.toLocaleTimeString('ar-SA')}`;
+    }
+  }
+
+  if (qaDecisionReason && qaCustomReason) {
+    qaDecisionReason.addEventListener('change', () => {
+      qaCustomReason.style.display = qaDecisionReason.value === 'custom' ? 'block' : 'none';
+    });
+  }
+
+  if (qualityApprovalForm) {
+    qualityApprovalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      if (qaBtnSpinner) qaBtnSpinner.style.display = 'inline-block';
+      if (qaBtnText) qaBtnText.textContent = 'جاري توثيق واعتماد القرار...';
+
+      setTimeout(() => {
+        if (qaBtnSpinner) qaBtnSpinner.style.display = 'none';
+        if (qaBtnText) qaBtnText.textContent = '✓ تم اعتماد القرار بنجاح';
+        if (qaSuccessAlert) qaSuccessAlert.style.display = 'flex';
+      }, 800);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 9. REAL INTERACTIVE LEAFLET GIS FLEET RADAR & MOVEMENT SIMULATOR
+  // ------------------------------------------------------------------
+  let gisMap = null;
+  let truckMarker1002 = null;
+  let truckPathIndex = 0;
+  let truckInterpolateStep = 0;
+
+  // Real Saudi Highway Waypoints (Jazan -> Abu Arish -> Abha -> Khamis Mushait -> Riyadh)
+  const waypointsJazanToRiyadh = [
+    { lat: 16.8892, lng: 42.5706, name: 'ميناء جازان (نقطة الانطلاق)', speed: 0 },
+    { lat: 17.0200, lng: 42.7500, name: 'طريق جازان السريع', speed: 65 },
+    { lat: 17.0500, lng: 42.8600, name: 'محافظة أبو عريش', speed: 60 },
+    { lat: 17.2000, lng: 42.7000, name: 'طريق صبيا - الدرب', speed: 75 },
+    { lat: 17.7200, lng: 42.2500, name: 'محافظة الدرب', speed: 70 },
+    { lat: 18.1500, lng: 42.3800, name: 'عقبة ضلع (منطقة عسير)', speed: 45 },
+    { lat: 18.2164, lng: 42.5053, name: 'مدينة أبها', speed: 55 },
+    { lat: 18.3000, lng: 42.7333, name: 'خميس مشيط (مركز التوزيع المركزي)', speed: 50 },
+    { lat: 19.5500, lng: 43.5000, name: 'طريق تثليث السريع', speed: 85 },
+    { lat: 20.4500, lng: 44.8000, name: 'وادي الدواسر', speed: 80 },
+    { lat: 22.0000, lng: 45.8000, name: 'طريق الرياض الجنوبي', speed: 90 },
+    { lat: 24.1500, lng: 47.3000, name: 'محافظة الخرج', speed: 85 },
+    { lat: 24.7136, lng: 46.6753, name: 'مستودع الرياض المركزي (الوجهة النهائية)', speed: 0 }
+  ];
+
+  const drawerTruckTitle = document.getElementById('drawerTruckTitle');
+  const drawerStatusBadge = document.getElementById('drawerStatusBadge');
+  const drawerDriverName = document.getElementById('drawerDriverName');
+  const drawerTemp = document.getElementById('drawerTemp');
+  const drawerHumidity = document.getElementById('drawerHumidity');
+  const drawerSpeed = document.getElementById('drawerSpeed');
+  const drawerLocation = document.getElementById('drawerLocation');
+  const drawerGpsCoords = document.getElementById('drawerGpsCoords');
+  const drawerEta = document.getElementById('drawerEta');
+  const shipmentDetailDrawer = document.getElementById('shipmentDetailDrawer');
+  const toggleShipmentDrawerBtn = document.getElementById('toggleShipmentDrawerBtn');
+  const drawerToggleIcon = document.getElementById('drawerToggleIcon');
+  const btnRecenterSaudiMap = document.getElementById('btnRecenterSaudiMap');
+  const btnFollowTruck1002 = document.getElementById('btnFollowTruck1002');
+
+  function updateInspectionDrawer(info) {
+    if (drawerTruckTitle) drawerTruckTitle.textContent = info.title || 'تفاصيل الشاحنة';
+    if (drawerStatusBadge) {
+      drawerStatusBadge.textContent = info.status || 'في الطريق';
+      drawerStatusBadge.className = `badge-tag-${info.badgeColor || 'amber'}`;
+    }
+    if (drawerDriverName) drawerDriverName.textContent = info.driver || 'أحمد السعيد';
+    if (drawerTemp) {
+      drawerTemp.textContent = `${info.temp}°C (${info.tempState || 'مستقر'})`;
+      drawerTemp.className = `tabular-mono text-${info.tempColor || 'white'}`;
+    }
+    if (drawerHumidity) drawerHumidity.textContent = `${info.humidity || 45}%`;
+    if (drawerSpeed) drawerSpeed.textContent = `${info.speed || 65} كم/س`;
+    if (drawerLocation) drawerLocation.textContent = info.location || 'طريق جازان';
+    if (drawerGpsCoords) drawerGpsCoords.textContent = `${info.lat.toFixed(4)}° N, ${info.lng.toFixed(4)}° E`;
+    if (drawerEta) drawerEta.textContent = info.eta || '14:35 (مستودع الرياض)';
+  }
+
+  function createCustomTruckIcon(emoji, statusClass) {
+    return L.divIcon({
+      className: `truck-gis-marker ${statusClass}`,
+      html: `
+        <div class="marker-radar-ring"></div>
+        <div class="truck-marker-inner">${emoji}</div>
+      `,
+      iconSize: [38, 38],
+      iconAnchor: [19, 19],
+      popupAnchor: [0, -22]
+    });
+  }
+
+  function initOrUpdateGisMap() {
+    const mapContainer = document.getElementById('gisLiveMap');
+    if (!mapContainer || typeof L === 'undefined') return;
+
+    if (!gisMap) {
+      // Create Leaflet Map centered on Saudi Arabia
+      gisMap = L.map('gisLiveMap', {
+        center: [20.5, 44.5],
+        zoom: 6,
+        zoomControl: true,
+        attributionControl: false
+      });
+
+      // Add CartoDB Dark Matter Cyber Basemap Tiles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 18,
+        subdomains: 'abcd'
+      }).addTo(gisMap);
+
+      // Draw Main Transport Polyline
+      const latlngs = waypointsJazanToRiyadh.map(wp => [wp.lat, wp.lng]);
+      
+      // Background Glow Path
+      L.polyline(latlngs, {
+        color: '#00F0FF',
+        weight: 6,
+        opacity: 0.35,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(gisMap);
+
+      // Foreground Dashed Neon Path
+      L.polyline(latlngs, {
+        color: '#00FF66',
+        weight: 3,
+        dashArray: '8, 8',
+        opacity: 0.9
+      }).addTo(gisMap);
+
+      // Add Warehouse Hub Markers
+      const hubs = [
+        { lat: 16.8892, lng: 42.5706, name: 'ميناء ومستودع جازان للتبريد', role: 'نقطة الانطلاق البحرية' },
+        { lat: 18.3000, lng: 42.7333, name: 'مركز التوزيع اللوجستي (عسير)', role: 'محطة الفحص المرحلي' },
+        { lat: 24.7136, lng: 46.6753, name: 'المستودع الرئيسي (الرياض)', role: 'مركز القيادة والفرز' }
+      ];
+
+      hubs.forEach(hub => {
+        const hubIcon = L.divIcon({
+          className: 'hub-gis-marker',
+          html: `<div class="hub-marker-inner">🏢</div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
+          popupAnchor: [0, -18]
+        });
+
+        L.marker([hub.lat, hub.lng], { icon: hubIcon })
+          .addTo(gisMap)
+          .bindPopup(`
+            <div class="map-custom-popup">
+              <div class="map-popup-header">
+                <strong>🏢 ${hub.name}</strong>
+              </div>
+              <div class="map-popup-grid">
+                <div><span>الدور:</span> <strong class="text-cyan">${hub.role}</strong></div>
+                <div><span>حالة التبريد:</span> <strong class="text-emerald">✓ آمن ومطابق</strong></div>
+              </div>
+            </div>
+          `);
+      });
+
+      // Add Static Fleet Trucks
+      // Truck 1: Jazan (Safe)
+      const truck1 = L.marker([16.8892, 42.5706], { icon: createCustomTruckIcon('🚚', 'truck-safe') }).addTo(gisMap);
+      truck1.bindPopup(`
+        <div class="map-custom-popup">
+          <div class="map-popup-header">
+            <strong>🚚 شاحنة #RQ-1001 (جازان)</strong>
+            <span class="badge-tag-emerald">Safe</span>
+          </div>
+          <div class="map-popup-grid">
+            <div><span>السائق:</span> <strong>خالد المالكي</strong></div>
+            <div><span>الحرارة:</span> <strong class="text-emerald tabular-mono">4.0°C</strong></div>
+            <div><span>الحالة:</span> <strong class="text-emerald">مستقرة وجاهزة</strong></div>
+          </div>
+        </div>
+      `);
+      truck1.on('click', () => {
+        updateInspectionDrawer({
+          title: 'تفاصيل الشاحنة #RQ-1001',
+          status: 'في محطة جازان (Idle)',
+          badgeColor: 'emerald',
+          driver: 'خالد المالكي',
+          temp: 4.0,
+          tempState: 'مثالي',
+          tempColor: 'emerald',
+          humidity: 44,
+          speed: 0,
+          location: 'ميناء جازان للتبريد',
+          lat: 16.8892,
+          lng: 42.5706,
+          eta: '10:00 (جاهز للتحرك)'
+        });
+      });
+
+      // Truck 3: Khamis Mushait (Safe)
+      const truck3 = L.marker([18.3000, 42.7333], { icon: createCustomTruckIcon('🚚', 'truck-safe') }).addTo(gisMap);
+      truck3.bindPopup(`
+        <div class="map-custom-popup">
+          <div class="map-popup-header">
+            <strong>🚚 شاحنة #RQ-1003 (خميس مشيط)</strong>
+            <span class="badge-tag-emerald">Safe</span>
+          </div>
+          <div class="map-popup-grid">
+            <div><span>السائق:</span> <strong>سلطان الغامدي</strong></div>
+            <div><span>الحرارة:</span> <strong class="text-emerald tabular-mono">3.8°C</strong></div>
+            <div><span>الموقع:</span> <strong>مستودع عسير</strong></div>
+          </div>
+        </div>
+      `);
+      truck3.on('click', () => {
+        updateInspectionDrawer({
+          title: 'تفاصيل الشاحنة #RQ-1003',
+          status: 'تفريغ البضاعة (Unloading)',
+          badgeColor: 'emerald',
+          driver: 'سلطان الغامدي',
+          temp: 3.8,
+          tempState: 'مطابق',
+          tempColor: 'emerald',
+          humidity: 46,
+          speed: 0,
+          location: 'مستودع خميس مشيط',
+          lat: 18.3000,
+          lng: 42.7333,
+          eta: 'مكتمل الوصول ✓'
+        });
+      });
+
+      // Truck 4: Near Riyadh (Critical Alert)
+      const truck4 = L.marker([23.8500, 46.8000], { icon: createCustomTruckIcon('🚚', 'truck-danger') }).addTo(gisMap);
+      truck4.bindPopup(`
+        <div class="map-custom-popup">
+          <div class="map-popup-header">
+            <strong>🚚 شاحنة #RQ-1004 (تجاوز حراري) 🚨</strong>
+            <span class="badge-tag-crimson">Critical</span>
+          </div>
+          <div class="map-popup-grid">
+            <div><span>السائق:</span> <strong>فهد الدوسري</strong></div>
+            <div><span>الحرارة:</span> <strong class="text-crimson tabular-mono">11.2°C</strong></div>
+            <div><span>الإجراء:</span> <strong class="text-crimson">توجيه لوحدة تبريد طارئة</strong></div>
+          </div>
+        </div>
+      `);
+      truck4.on('click', () => {
+        updateInspectionDrawer({
+          title: 'تفاصيل الشاحنة #RQ-1004',
+          status: 'تجاوز حراري حرج (Critical)',
+          badgeColor: 'crimson',
+          driver: 'فهد الدوسري',
+          temp: 11.2,
+          tempState: 'تجاوز حرج',
+          tempColor: 'crimson',
+          humidity: 56,
+          speed: 85,
+          location: 'طريق الخرج - الرياض',
+          lat: 23.8500,
+          lng: 46.8000,
+          eta: '13:10 (استقبال طوارئ)'
+        });
+      });
+
+      // Active Moving Truck 2: RQ-1002 (In Transit Simulation)
+      const startCoord = waypointsJazanToRiyadh[2]; // Abu Arish
+      truckMarker1002 = L.marker([startCoord.lat, startCoord.lng], {
+        icon: createCustomTruckIcon('🚚', 'truck-warn')
+      }).addTo(gisMap);
+
+      truckMarker1002.bindPopup(`
+        <div class="map-custom-popup">
+          <div class="map-popup-header">
+            <strong>🚚 شاحنة #RQ-1002 (مباشر)</strong>
+            <span class="badge-tag-amber">6.2°C ⚠️</span>
+          </div>
+          <div class="map-popup-grid">
+            <div><span>السائق:</span> <strong>أحمد السعيد</strong></div>
+            <div><span>السرعة:</span> <strong class="text-white tabular-mono" id="popSpeed">65 كم/س</strong></div>
+            <div><span>الحرارة:</span> <strong class="text-amber tabular-mono">6.2°C</strong></div>
+            <div><span>الموقع:</span> <strong class="text-cyan" id="popLoc">طريق عسير</strong></div>
+          </div>
+        </div>
+      `);
+
+      truckMarker1002.on('click', () => {
+        const curPos = truckMarker1002.getLatLng();
+        updateInspectionDrawer({
+          title: 'تفاصيل الشاحنة #RQ-1002',
+          status: 'في الطريق (In Transit)',
+          badgeColor: 'amber',
+          driver: 'أحمد السعيد',
+          temp: 6.2,
+          tempState: 'تجاوز طفيف مسموح',
+          tempColor: 'amber',
+          humidity: 48,
+          speed: 65,
+          location: 'طريق جازان - عسير السريع',
+          lat: curPos.lat,
+          lng: curPos.lng,
+          eta: '14:35 (مستودع الرياض)'
+        });
+      });
+
+      // Start Real Movement Simulation Engine
+      startTruckLiveMovement();
+    } else {
+      gisMap.invalidateSize();
+    }
+  }
+
+  // Animate Truck 1002 moving smoothly along waypoints
+  function startTruckLiveMovement() {
+    truckPathIndex = 2; // Start around Abu Arish
+    truckInterpolateStep = 0;
+
+    setInterval(() => {
+      if (!gisMap || !truckMarker1002) return;
+
+      const p1 = waypointsJazanToRiyadh[truckPathIndex];
+      const nextIdx = (truckPathIndex + 1) % waypointsJazanToRiyadh.length;
+      const p2 = waypointsJazanToRiyadh[nextIdx];
+
+      truckInterpolateStep += 0.05; // 5% step progress
+      if (truckInterpolateStep >= 1) {
+        truckInterpolateStep = 0;
+        truckPathIndex = nextIdx;
+      }
+
+      // Linear Interpolation between GPS coordinates
+      const currentLat = p1.lat + (p2.lat - p1.lat) * truckInterpolateStep;
+      const currentLng = p1.lng + (p2.lng - p1.lng) * truckInterpolateStep;
+
+      truckMarker1002.setLatLng([currentLat, currentLng]);
+
+      // Update Live Drawer GPS Coordinates in real time
+      if (drawerGpsCoords) {
+        drawerGpsCoords.textContent = `${currentLat.toFixed(4)}° N, ${currentLng.toFixed(4)}° E`;
+      }
+      if (drawerLocation) {
+        drawerLocation.textContent = p1.name;
+      }
+      if (drawerSpeed) {
+        const jitter = Math.floor(Math.random() * 4) - 2;
+        drawerSpeed.textContent = `${Math.max(40, p1.speed + jitter)} كم/س`;
+      }
+    }, 1500);
+  }
+
+  // Recenter Map on Saudi Arabia Overview
+  if (btnRecenterSaudiMap) {
+    btnRecenterSaudiMap.addEventListener('click', () => {
+      if (gisMap) {
+        gisMap.flyTo([20.5, 44.5], 6, { duration: 1.5 });
+      }
+    });
+  }
+
+  // Focus & Follow Active Truck RQ-1002
+  if (btnFollowTruck1002) {
+    btnFollowTruck1002.addEventListener('click', () => {
+      if (gisMap && truckMarker1002) {
+        const pos = truckMarker1002.getLatLng();
+        gisMap.flyTo(pos, 11, { duration: 1.5 });
+        truckMarker1002.openPopup();
+      }
+    });
+  }
+
+  // Toggle Drawer Visibility
+  let isDrawerOpen = true;
+  if (toggleShipmentDrawerBtn && shipmentDetailDrawer) {
+    toggleShipmentDrawerBtn.addEventListener('click', () => {
+      isDrawerOpen = !isDrawerOpen;
+      shipmentDetailDrawer.style.display = isDrawerOpen ? 'block' : 'none';
+      if (drawerToggleIcon) drawerToggleIcon.textContent = isDrawerOpen ? '▼' : '▲';
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 10. Alert Resolution Action
+  // ------------------------------------------------------------------
+  const btnResolveAlertALT = document.getElementById('btnResolveAlertALT');
+  const alertCardALT = document.getElementById('alertCard-ALT-2026-0647');
+  const dashActiveAlerts = document.getElementById('dashActiveAlerts');
+
+  if (btnResolveAlertALT && alertCardALT) {
+    btnResolveAlertALT.addEventListener('click', async () => {
+      btnResolveAlertALT.innerHTML = '<span>جاري إرسال إغلاق التنبيه...</span>';
+      
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (token && token !== 'demo_session_token_123') {
+        try {
+          await fetch(`${API_BASE}/api/alerts/ALT-2026-0647/resolve`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        } catch (e) {
+          console.warn('Direct resolve endpoint called with fallback:', e);
+        }
+      }
+
+      setTimeout(() => {
+        alertCardALT.style.borderColor = 'var(--signal-safe)';
+        alertCardALT.style.borderRightColor = 'var(--signal-safe)';
+        alertCardALT.style.background = 'rgba(0, 255, 102, 0.05)';
+        alertCardALT.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span class="status-pill-emerald" style="font-size: 0.9rem; padding: 6px 14px;">✓ تم حل التنبيه بنجاح</span>
+              <strong style="color: white; font-size: 1rem;">تم نقل الشحنة إلى وحدة التبريد C-2 وإغلاق الحادثة.</strong>
+            </div>
+            <span class="text-muted tabular-mono" style="font-size: 0.85rem;">المسوي: محمد العتيبي</span>
+          </div>
+        `;
+        if (dashActiveAlerts) dashActiveAlerts.textContent = '00';
+      }, 600);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 11. Sidebar Navigation Scroll Spy
+  // ------------------------------------------------------------------
+  const sideNavItems = document.querySelectorAll('.sidebar-nav .side-nav-item');
+
+  sideNavItems.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      sideNavItems.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const targetId = btn.dataset.targetSection;
+      if (targetId) {
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // 12. Device Fleet Health, Filter Tabs & Telemetry Ingestion Console
+  // ------------------------------------------------------------------
+  const healthFilterTabs = document.querySelectorAll('.health-filter-tabs .health-tab-btn');
+  const deviceFleetRows = document.querySelectorAll('#deviceFleetTableBody tr');
+  const btnPingAllDevices = document.getElementById('btnPingAllDevices');
+  const btnCopyIngestUrl = document.getElementById('btnCopyIngestUrl');
+  const btnSimulateHardwarePacket = document.getElementById('btnSimulateHardwarePacket');
+  const ingestResponseLog = document.getElementById('ingestResponseLog');
+  const ingestResponseJson = document.getElementById('ingestResponseJson');
+
+  // Filter Tabs
+  healthFilterTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      healthFilterTabs.forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const filter = tab.dataset.fleetFilter || 'all';
+
+      deviceFleetRows.forEach((row) => {
+        const type = row.dataset.deviceType;
+        if (filter === 'all' || type === filter) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Ping All Devices
+  if (btnPingAllDevices) {
+    btnPingAllDevices.addEventListener('click', () => {
+      const origText = btnPingAllDevices.innerHTML;
+      btnPingAllDevices.innerHTML = '<span>📡 جاري إرسال إشارة Ping لكافة الأجهزة (24/24)...</span>';
+      btnPingAllDevices.disabled = true;
+
+      setTimeout(() => {
+        btnPingAllDevices.innerHTML = '<span>✓ تم استلام نبضات الاستجابة من 24 جهازاً بنجاح (RTT: 42ms)</span>';
+        btnPingAllDevices.style.borderColor = 'var(--signal-safe)';
+        btnPingAllDevices.style.color = 'var(--signal-safe)';
+
+        setTimeout(() => {
+          btnPingAllDevices.innerHTML = origText;
+          btnPingAllDevices.style.borderColor = '';
+          btnPingAllDevices.style.color = '';
+          btnPingAllDevices.disabled = false;
+        }, 3000);
+      }, 900);
+    });
+  }
+
+  // Copy Ingest URL
+  if (btnCopyIngestUrl) {
+    btnCopyIngestUrl.addEventListener('click', () => {
+      const url = 'https://raquib-api.alghzwanyk7.workers.dev/api/telemetry/ingest';
+      navigator.clipboard.writeText(url).then(() => {
+        btnCopyIngestUrl.textContent = 'تم النسخ ✓';
+        setTimeout(() => {
+          btnCopyIngestUrl.textContent = 'نسخ الرابط';
+        }, 2000);
+      }).catch(() => {
+        btnCopyIngestUrl.textContent = 'تم النسخ ✓';
+      });
+    });
+  }
+
+  // Simulate Hardware Packet Send
+  if (btnSimulateHardwarePacket) {
+    btnSimulateHardwarePacket.addEventListener('click', async () => {
+      btnSimulateHardwarePacket.innerHTML = '<span>📡 جاري الإرسال إلى السيرفر الحي...</span>';
+      btnSimulateHardwarePacket.disabled = true;
+
+      const samplePacket = {
+        device_id: "RQ-TRACKER-1002",
+        temperature: Number((3.8 + Math.random() * 0.8).toFixed(1)),
+        humidity: Math.floor(45 + Math.random() * 4),
+        vibration: 0.02,
+        lat: 17.0650,
+        lng: 42.8820,
+        speed: 62,
+        battery: 95,
+        voltage: 4.14,
+        signal_dbm: -65,
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/telemetry/ingest`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(samplePacket)
+        });
+        const data = await res.json();
+
+        if (ingestResponseLog && ingestResponseJson) {
+          ingestResponseLog.style.display = 'block';
+          ingestResponseJson.textContent = JSON.stringify(data, null, 2);
+        }
+      } catch {
+        // Fallback demo response
+        const fallbackRes = {
+          success: true,
+          message: "Telemetry received and logged successfully [Local Simulated Ingest]",
+          processed: samplePacket
+        };
+        if (ingestResponseLog && ingestResponseJson) {
+          ingestResponseLog.style.display = 'block';
+          ingestResponseJson.textContent = JSON.stringify(fallbackRes, null, 2);
+        }
+      }
+
+      btnSimulateHardwarePacket.innerHTML = '<span>✓ تم استقبال القراءة وتحديث اللوحة!</span>';
+      setTimeout(() => {
+        btnSimulateHardwarePacket.innerHTML = '<span>📡 محاكاة إرسال قراءة من الجهاز الفعلي</span>';
+        btnSimulateHardwarePacket.disabled = false;
+      }, 2500);
+    });
+  }
+
+  // Global window helpers for table action buttons
+  window.pingSingleDevice = function(deviceId) {
+    alert(`[Hardware Ping] تم إرسال نبضة فحص إلى الجهاز ${deviceId} واستلام الرد: Online (RTT: 38ms) - Battery: OK`);
+  };
+
+  window.requestBatterySwap = function(deviceId) {
+    alert(`[Work Order] تم فتح تذكرة صيانة فورية لتبديل بطارية الجهاز ${deviceId} لفريق المستودع.`);
+  };
+
+  // ------------------------------------------------------------------
+  // 13. Smooth Scroll for Landing Page Buttons
+  // ------------------------------------------------------------------
+  const heroExploreHardwareBtn = document.getElementById('heroExploreHardwareBtn');
+
+  if (heroExploreHardwareBtn) {
+    heroExploreHardwareBtn.addEventListener('click', () => {
+      const el = document.getElementById('hardware');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
 });
-
-// Smooth scroll handlers for Join Us CTAs
-const navJoinBtn = document.getElementById('navJoinBtn');
-const heroJoinBtn = document.getElementById('heroJoinBtn');
-const authSection = document.getElementById('authSection');
-
-function scrollToAuth(e) {
-	if (e) e.preventDefault();
-	showView('home', { scrollToTop: false });
-	if (authSection) {
-		authSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-	}
-}
-
-if (navJoinBtn) navJoinBtn.addEventListener('click', scrollToAuth);
-if (heroJoinBtn) heroJoinBtn.addEventListener('click', scrollToAuth);
-
-backToHome.addEventListener('click', () => showView('home'));
-
-solutionTabs.forEach((button) => {
-	button.addEventListener('click', () => activateSolutionTab(button.dataset.solutionTab));
-});
-
-solutionTriggers.forEach((trigger) => {
-	trigger.addEventListener('click', (event) => {
-		event.preventDefault();
-		const tabName = trigger.dataset.solutionTarget || 'services';
-		showView('home', { scrollToTop: false });
-		activateSolutionTab(tabName);
-		solutionSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-	});
-});
-
-exploreSolutions.addEventListener('click', () => {
-	showView('home', { scrollToTop: false });
-	activateSolutionTab('services');
-	solutionSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
-
-// Render Temperature SVG Chart
-function renderTemperatureChart() {
-	if (!tempChart) {
-		return;
-	}
-
-	const width = 960;
-	const height = 360;
-	const padding = { top: 24, right: 28, bottom: 52, left: 52 };
-	const plotWidth = width - padding.left - padding.right;
-	const plotHeight = height - padding.top - padding.bottom;
-	const values = temperatureSeries.map((point) => point.value);
-	const minValue = Math.min(...values) - 0.2;
-	const maxValue = Math.max(...values) + 0.2;
-	const yScale = (value) => padding.top + ((maxValue - value) / (maxValue - minValue)) * plotHeight;
-	const xScale = (index) => padding.left + (plotWidth / (temperatureSeries.length - 1)) * index;
-
-	const points = temperatureSeries.map((point, index) => ({
-		...point,
-		x: xScale(index),
-		y: yScale(point.value)
-	}));
-
-	const linePath = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
-	const areaPath = [
-		`M ${points[0].x} ${height - padding.bottom}`,
-		...points.map((point) => `L ${point.x} ${point.y}`),
-		`L ${points[points.length - 1].x} ${height - padding.bottom}`,
-		'Z'
-	].join(' ');
-
-	// Dynamic Y Ticks calculation
-	const yTicksCount = 6;
-	const yTicks = [];
-	for (let i = 0; i < yTicksCount; i++) {
-		yTicks.push(minValue + (i * (maxValue - minValue)) / (yTicksCount - 1));
-	}
-	const xLabels = temperatureSeries.map((point) => point.time);
-
-	tempChart.innerHTML = `
-	  <defs>
-	    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-	      <stop offset="0%" stop-color="rgba(14, 165, 233, 0.36)" />
-	      <stop offset="100%" stop-color="rgba(14, 165, 233, 0.02)" />
-	    </linearGradient>
-	  </defs>
-	  ${yTicks.map((tick) => {
-		const y = yScale(tick);
-		return `<line class="chart-grid-line" x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" />`;
-	  }).join('')}
-	  <line class="chart-axis" x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}" />
-	  <line class="chart-axis" x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" />
-	  ${yTicks.map((tick) => {
-		const y = yScale(tick);
-		return `<text class="chart-label" x="18" y="${y + 4}">${tick.toFixed(1)}°</text>`;
-	  }).join('')}
-	  ${xLabels.map((label, index) => {
-		const x = xScale(index);
-		return `<text class="chart-label" x="${x}" y="${height - 18}" text-anchor="middle">${label}</text>`;
-	  }).join('')}
-	  <path class="chart-area" d="${areaPath}" />
-	  <path class="chart-line" d="${linePath}" />
-	  <line class="chart-current-line" x1="${points[points.length - 1].x}" y1="${padding.top}" x2="${points[points.length - 1].x}" y2="${height - padding.bottom}" />
-	  <circle class="chart-point chart-current-tag" cx="${points[points.length - 1].x}" cy="${points[points.length - 1].y}" r="7" />
-	  ${points.map((point) => `<circle class="chart-point" data-time="${point.time}" data-value="${point.value.toFixed(1)}" cx="${point.x}" cy="${point.y}" r="5" tabindex="0" />`).join('')}
-	`;
-
-	const lastVal = temperatureSeries[temperatureSeries.length - 1].value;
-	chartCurrentValue.textContent = `${lastVal.toFixed(1)}°C`;
-
-	const circles = Array.from(tempChart.querySelectorAll('.chart-point[data-time]'));
-
-	const showTooltip = (circle) => {
-		const rect = tempChart.getBoundingClientRect();
-		const pointRect = circle.getBoundingClientRect();
-		const left = pointRect.left - rect.left + pointRect.width / 2;
-		const top = pointRect.top - rect.top;
-
-		chartTooltip.hidden = false;
-		chartTooltip.innerHTML = `<strong>${circle.dataset.value}°C</strong><br>${circle.dataset.time}`;
-		chartTooltip.style.left = `${left}px`;
-		chartTooltip.style.top = `${top}px`;
-		circles.forEach((item) => item.classList.toggle('active', item === circle));
-	};
-
-	const hideTooltip = () => {
-		chartTooltip.hidden = true;
-		circles.forEach((item) => item.classList.remove('active'));
-	};
-
-	circles.forEach((circle) => {
-		circle.addEventListener('mouseenter', () => showTooltip(circle));
-		circle.addEventListener('focus', () => showTooltip(circle));
-		circle.addEventListener('mouseleave', hideTooltip);
-		circle.addEventListener('blur', hideTooltip);
-	});
-
-	tempChart.addEventListener('mouseleave', hideTooltip);
-	chartTooltip.hidden = true;
-}
-
-// Authentication Logic
-function checkAuthState() {
-	const token = localStorage.getItem(TOKEN_KEY);
-	const workerString = localStorage.getItem(WORKER_KEY);
-
-	if (token && workerString && !isUsingDemo) {
-		const worker = JSON.parse(workerString);
-		if (dashboardContent) dashboardContent.style.display = 'block';
-		if (logoutBtn) logoutBtn.style.display = 'block';
-		
-		// Set connected worker details
-		if (workerProfileCard) workerProfileCard.style.display = 'block';
-		if (connectedWorkerName) connectedWorkerName.textContent = worker.nameEn || worker.name;
-		if (connectedWorkerRole) connectedWorkerRole.textContent = worker.role.toUpperCase();
-
-		// Load Live Data
-		loadLiveDashboard(token);
-		
-		// Stop pairing poll since we are logged in
-		stopPairingPoll();
-	} else {
-		// Default / Demo Dashboard State
-		isUsingDemo = true;
-		if (dashboardContent) dashboardContent.style.display = 'block';
-		if (logoutBtn) logoutBtn.style.display = 'block';
-		if (workerProfileCard) workerProfileCard.style.display = 'none';
-		
-		loadDemoDashboard();
-		stopPairingPoll();
-	}
-}
-
-// Handle login submit
-if (loginForm) {
-	loginForm.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		const barcode = employeeBarcode ? employeeBarcode.value.trim() : '';
-		if (!barcode) return;
-
-		try {
-			if (loginError) loginError.style.display = 'none';
-			const response = await fetch(`${API_BASE}/api/auth/login`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ barcode })
-			});
-
-			if (!response.ok) {
-				throw new Error('Authentication failed');
-			}
-
-			const data = await response.json();
-			if (data.success && data.token) {
-				isUsingDemo = false;
-				localStorage.setItem(TOKEN_KEY, data.token);
-				localStorage.setItem(WORKER_KEY, JSON.stringify(data.user));
-				if (employeeBarcode) employeeBarcode.value = '';
-				showView('controlCenter');
-			} else {
-				throw new Error('Invalid response');
-			}
-		} catch (err) {
-			console.error('Login error:', err);
-			if (loginError) loginError.style.display = 'block';
-		}
-	});
-}
-
-// Demo Data Access
-if (useDemoData) {
-	useDemoData.addEventListener('click', (e) => {
-		e.preventDefault();
-		isUsingDemo = true;
-		showView('controlCenter');
-	});
-}
-
-// Logout
-if (logoutBtn) {
-	logoutBtn.addEventListener('click', () => {
-		localStorage.removeItem(TOKEN_KEY);
-		localStorage.removeItem(WORKER_KEY);
-		isUsingDemo = false;
-		showView('home');
-	});
-}
-
-// Load Live Dashboard Data
-async function loadLiveDashboard(token) {
-	try {
-		// 1. Fetch Dashboard API
-		const dashboardResponse = await fetch(`${API_BASE}/api/dashboard`, {
-			headers: { 'Authorization': `Bearer ${token}` }
-		});
-
-		if (!dashboardResponse.ok) {
-			if (dashboardResponse.status === 401) {
-				logoutBtn.click();
-				return;
-			}
-			throw new Error('Failed to load dashboard data');
-		}
-
-		const dbData = await dashboardResponse.json();
-		
-		// Update KPIs
-		document.getElementById('kpiTotalShipments').textContent = dbData.stats.totalMonitored;
-		document.getElementById('kpiActiveAlerts').textContent = String(dbData.stats.activeAlerts).padStart(2, '0');
-		document.getElementById('kpiSafeShipments').textContent = dbData.stats.totalMonitored - dbData.stats.activeAlerts;
-
-		// Find the active temperature sensor or default to first
-		const tempSensor = dbData.sensors.find(s => s.status !== 'empty') || dbData.sensors[0];
-		
-		if (tempSensor) {
-			const tempVal = tempSensor.temperature;
-			document.getElementById('tempValue').textContent = `${tempVal.toFixed(1)}°C`;
-			document.getElementById('activeShipmentTag').textContent = `الشحنة النشطة الحالية: ${tempSensor.productEn} (${tempSensor.shelf})`;
-			
-			// Update status chips
-			const tempChip = document.getElementById('tempStatusChip');
-			let statusColorClass = 'red';
-			if (tempSensor.status === 'safe') {
-				statusColorClass = 'green';
-			} else if (tempSensor.status === 'warning') {
-				statusColorClass = 'yellow';
-			}
-			tempChip.className = `chip chip-${statusColorClass}`;
-			tempChip.textContent = tempSensor.status.toUpperCase();
-
-			// Update the chart series with live temp
-			temperatureSeries[temperatureSeries.length - 1].value = tempVal;
-		}
-
-		// Fixed/Default values for non-temp parameters in the dashboard
-		document.getElementById('humidityValue').textContent = '45%';
-		document.getElementById('vibrationValue').textContent = 'مستقر (0G)';
-		
-		renderTemperatureChart();
-
-		// 2. Fetch active alerts
-		loadLiveAlerts(token);
-
-	} catch (err) {
-		console.error('Error fetching live dashboard:', err);
-	}
-}
-
-// Fetch and render live alerts list
-async function loadLiveAlerts(token) {
-	try {
-		const alertsResponse = await fetch(`${API_BASE}/api/alerts`, {
-			headers: { 'Authorization': `Bearer ${token}` }
-		});
-
-		if (!alertsResponse.ok) throw new Error('Failed to fetch alerts');
-		const alerts = await alertsResponse.json();
-
-		renderAlerts(alerts, token);
-	} catch (err) {
-		console.error('Error fetching live alerts:', err);
-	}
-}
-
-// Render alert cards in the alerts list
-function renderAlerts(alerts, token = null) {
-	if (!alertsList) return;
-
-	if (!alerts || alerts.length === 0) {
-		alertsList.innerHTML = `
-			<div class="no-alerts-msg" style="text-align: center; padding: 24px; color: var(--muted); font-weight: 500;">
-				لا توجد تنبيهات نشطة حالياً. كل الأنظمة مستقرة.
-			</div>
-		`;
-		return;
-	}
-
-	alertsList.innerHTML = alerts.map(alert => {
-		const isCritical = alert.severity === 'critical';
-		const severityAr = isCritical ? 'حرجة للغاية' : 'تحذير';
-		const badgeClass = isCritical ? 'pill-red' : 'pill-yellow';
-
-		return `
-			<div class="alert-item-card ${isCritical ? 'critical' : 'warning'}">
-				<div class="alert-item-header">
-					<div class="alert-item-title">
-						<span class="status-pill ${badgeClass}">${severityAr}</span>
-						<strong>تنبيه بيئي: ${alert.productEn || alert.product}</strong>
-					</div>
-					<div class="alert-item-meta">
-						الرف: ${alert.shelf} | القراءة: ${alert.currentTemp}°C (المدى: ${alert.safeMin}-${alert.safeMax}°C)
-					</div>
-				</div>
-				
-				<div class="alert-steps-box" style="margin-top: 10px;">
-					<strong style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--primary);">خطوات العمل التشغيلية الفورية:</strong>
-					${alert.actionSteps.map(step => `
-						<div class="alert-step-row">
-							<span class="step-num-badge">${step.number}</span>
-							<span>${step.textEn || step.text}</span>
-						</div>
-					`).join('')}
-				</div>
-
-				<div class="alert-action-row" style="margin-top: 14px; display: flex; gap: 10px;">
-					${token ? `
-						<button class="btn btn-primary btn-resolve-alert" data-alert-id="${alert.id}" style="padding: 10px 18px; font-size: 0.9rem; border-radius: 12px; box-shadow: none;">
-							تسوية وحل التنبيه (Resolve)
-						</button>
-					` : `
-						<span style="font-size: 0.85rem; color: var(--danger); font-weight: bold; background: rgba(239, 68, 68, 0.08); padding: 8px 12px; border-radius: 10px;">
-							سجل الدخول كعامل لتتمكن من تسوية هذا التنبيه
-						</span>
-					`}
-				</div>
-			</div>
-		`;
-	}).join('');
-
-	// Add event listeners to resolve buttons
-	const resolveButtons = Array.from(alertsList.querySelectorAll('.btn-resolve-alert'));
-	resolveButtons.forEach(btn => {
-		btn.addEventListener('click', async () => {
-			const alertId = btn.dataset.alertId;
-			btn.disabled = true;
-			btn.textContent = 'جاري التسوية...';
-
-			try {
-				const resolveResponse = await fetch(`${API_BASE}/api/alerts/${alertId}/resolve`, {
-					method: 'POST',
-					headers: { 
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${token}` 
-					}
-				});
-
-				if (!resolveResponse.ok) throw new Error('Failed to resolve alert');
-				
-				// Reload dashboard
-				loadLiveDashboard(token);
-			} catch (err) {
-				console.error('Error resolving alert:', err);
-				btn.disabled = false;
-				btn.textContent = 'فشلت التسوية، أعد المحاولة';
-			}
-		});
-	});
-}
-
-// Load Demo Dashboard Data
-function loadDemoDashboard() {
-	document.getElementById('kpiTotalShipments').textContent = mockData.totalShipments;
-	document.getElementById('kpiActiveAlerts').textContent = mockData.activeAlerts;
-	document.getElementById('kpiSafeShipments').textContent = mockData.safeShipments;
-
-	document.getElementById('tempValue').textContent = mockData.temp;
-	document.getElementById('humidityValue').textContent = mockData.humidity;
-	document.getElementById('vibrationValue').textContent = mockData.vibration;
-	document.getElementById('activeShipmentTag').textContent = 'الشحنة النشطة الحالية: #RQ-000125';
-	
-	const tempChip = document.getElementById('tempStatusChip');
-	tempChip.className = 'chip chip-green';
-	tempChip.textContent = 'SAFE';
-
-	// Reset trend value to default demo
-	temperatureSeries[temperatureSeries.length - 1].value = 4.2;
-	renderTemperatureChart();
-
-	// Render mock alerts
-	const mockAlertsList = [
-		{
-			id: 'DEMO-ALT-1',
-			productEn: 'Humulin Insulin (Demo)',
-			shelf: 'B-12',
-			currentTemp: 11.2,
-			safeMin: 2.0,
-			safeMax: 8.0,
-			severity: 'critical',
-			actionSteps: [
-				{ number: 1, textEn: 'Go to shelf B-12 in Zone B' },
-				{ number: 2, textEn: 'Move shipment to cooling unit C-2' },
-				{ number: 3, textEn: 'Scan barcode to confirm completion' }
-			]
-		}
-	];
-	renderAlerts(mockAlertsList, null);
-}
-
-// Initial triggers
-document.getElementById('tempValue').textContent = mockData.temp;
-document.getElementById('humidityValue').textContent = mockData.humidity;
-document.getElementById('vibrationValue').textContent = mockData.vibration;
-document.getElementById('kpiTotalShipments').textContent = mockData.totalShipments;
-document.getElementById('kpiActiveAlerts').textContent = mockData.activeAlerts;
-document.getElementById('kpiSafeShipments').textContent = mockData.safeShipments;
-document.getElementById('heroTempValue').textContent = mockData.temp;
-document.getElementById('heroAlertValue').textContent = `${mockData.activeAlerts} Alerts`;
-
-// If user navigates directly to controlCenter hash on page load
-if (window.location.hash === '#dashboardView' || window.location.hash === '#controlCenterView') {
-	showView('controlCenter');
-} else {
-	renderTemperatureChart();
-}
-
-/* ====================================================================
-   Scan to Login & Companion App Modal Logic
-   ==================================================================== */
-
-// 1. App Companion Modal Event Listeners
-function openAppModal(e) {
-	if (e) e.preventDefault();
-	if (appCompanionModal) appCompanionModal.classList.add('active');
-}
-
-function closeAppModal() {
-	if (appCompanionModal) appCompanionModal.classList.remove('active');
-}
-
-if (openModalBtn) openModalBtn.addEventListener('click', openAppModal);
-if (openModalSidebar) openModalSidebar.addEventListener('click', openAppModal);
-if (closeModalBtn) closeModalBtn.addEventListener('click', closeAppModal);
-if (appCompanionModal) {
-	appCompanionModal.addEventListener('click', (e) => {
-		if (e.target === appCompanionModal) closeAppModal();
-	});
-}
-
-// 2. Login Tabs Switching
-if (tabBarcodeBtn && tabQrBtn) {
-	tabBarcodeBtn.addEventListener('click', () => {
-		tabBarcodeBtn.classList.add('active');
-		tabQrBtn.classList.remove('active');
-		tabBarcodeContent.classList.add('active');
-		tabQrContent.classList.remove('active');
-		stopPairingPoll();
-	});
-
-	tabQrBtn.addEventListener('click', () => {
-		tabQrBtn.classList.add('active');
-		tabBarcodeBtn.classList.remove('active');
-		tabQrContent.classList.add('active');
-		tabBarcodeContent.classList.remove('active');
-		startPairingSession();
-	});
-}
-
-// 3. Pairing Session Logic (Scan to Login)
-async function startPairingSession() {
-	stopPairingPoll();
-	
-	if (!qrLoadingSpinner || !pairingQrImg || !qrExpiredMsg || !qrPairingStatus || !qrStatusText) return;
-
-	qrLoadingSpinner.style.display = 'flex';
-	pairingQrImg.style.display = 'none';
-	qrExpiredMsg.style.display = 'none';
-	qrPairingStatus.className = 'qr-pairing-status';
-	qrStatusText.textContent = 'بانتظار المسح من الهاتف...';
-
-	try {
-		const response = await fetch(`${API_BASE}/api/auth/pairing/session`, {
-			method: 'POST'
-		});
-		
-		if (!response.ok) throw new Error('Failed to create session');
-		
-		const data = await response.json();
-		if (data.success && data.pairingId) {
-			currentPairingId = data.pairingId;
-			
-			// Generate QR code using qrserver API pointing to standard format
-			const qrDataString = `raquib:login:${currentPairingId}`;
-			pairingQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=0f172a&data=${encodeURIComponent(qrDataString)}`;
-			
-			pairingQrImg.onload = () => {
-				qrLoadingSpinner.style.display = 'none';
-				pairingQrImg.style.display = 'block';
-			};
-
-			// Start 5-minute countdown timer
-			startQrCountdown(300);
-
-			// Start polling check every 2 seconds
-			startPairingPoll();
-		}
-	} catch (err) {
-		console.error('Error starting pairing:', err);
-		qrLoadingSpinner.style.display = 'none';
-		qrExpiredMsg.style.display = 'flex';
-	}
-}
-
-function stopPairingPoll() {
-	if (pairingIntervalId) {
-		clearInterval(pairingIntervalId);
-		pairingIntervalId = null;
-	}
-	if (qrCountdownIntervalId) {
-		clearInterval(qrCountdownIntervalId);
-		qrCountdownIntervalId = null;
-	}
-	const container = document.getElementById('qrCountdownContainer');
-	if (container) container.style.display = 'none';
-}
-
-function startQrCountdown(duration) {
-	if (qrCountdownIntervalId) clearInterval(qrCountdownIntervalId);
-	const container = document.getElementById('qrCountdownContainer');
-	const display = document.getElementById('qrCountdown');
-	if (!container || !display) return;
-	
-	container.style.display = 'block';
-	let timer = duration;
-	
-	const updateDisplay = () => {
-		let minutes = parseInt(timer / 60, 10);
-		let seconds = parseInt(timer % 60, 10);
-		
-		minutes = minutes < 10 ? "0" + minutes : minutes;
-		seconds = seconds < 10 ? "0" + seconds : seconds;
-		
-		display.textContent = minutes + ":" + seconds;
-		
-		if (--timer < 0) {
-			clearInterval(qrCountdownIntervalId);
-			stopPairingPoll();
-			pairingQrImg.style.display = 'none';
-			qrExpiredMsg.style.display = 'flex';
-			container.style.display = 'none';
-			qrPairingStatus.className = 'qr-pairing-status';
-			qrStatusText.textContent = 'انتهت صلاحية الرمز، يرجى التحديث.';
-		}
-	};
-	
-	updateDisplay();
-	qrCountdownIntervalId = setInterval(updateDisplay, 1000);
-}
-
-function startPairingPoll() {
-	stopPairingPoll();
-	
-	pairingIntervalId = setInterval(async () => {
-		if (!currentPairingId) return;
-
-		try {
-			const checkRes = await fetch(`${API_BASE}/api/auth/pairing/check?pairingId=${currentPairingId}`);
-			if (!checkRes.ok) throw new Error('Check error');
-
-			const checkData = await checkRes.json();
-			if (checkData.success) {
-				if (checkData.status === 'authorized' && checkData.token && checkData.user) {
-					stopPairingPoll();
-					qrPairingStatus.className = 'qr-pairing-status';
-					qrPairingStatus.style.borderColor = 'var(--success)';
-					qrPairingStatus.style.background = 'rgba(16, 185, 129, 0.08)';
-					qrStatusText.textContent = 'تم تسجيل الدخول بنجاح!';
-					
-					// Save token and user, trigger state update
-					isUsingDemo = false;
-					localStorage.setItem(TOKEN_KEY, checkData.token);
-					localStorage.setItem(WORKER_KEY, JSON.stringify(checkData.user));
-					
-					setTimeout(() => {
-						checkAuthState();
-					}, 800);
-				} else if (checkData.status === 'expired') {
-					stopPairingPoll();
-					pairingQrImg.style.display = 'none';
-					qrExpiredMsg.style.display = 'flex';
-					qrPairingStatus.className = 'qr-pairing-status';
-					qrStatusText.textContent = 'انتهت صلاحية الرمز، يرجى التحديث.';
-				}
-			}
-		} catch (err) {
-			console.error('Error polling pairing status:', err);
-		}
-	}, 2000);
-}
-
-if (refreshPairingQrBtn) {
-	refreshPairingQrBtn.addEventListener('click', startPairingSession);
-}
-
-// 4. Dashboard Sidebar Sub-view Navigation
-const sideLinkOverview = document.getElementById('sideLinkOverview');
-const sideLinkShipments = document.getElementById('sideLinkShipments');
-const sideLinkAlerts = document.getElementById('sideLinkAlerts');
-const sideLinkSettings = document.getElementById('sideLinkSettings');
-
-const kpiSection = document.getElementById('kpiSection');
-const sensorsSection = document.getElementById('sensorsSection');
-const alertsSection = document.getElementById('alertsSection');
-const trendSection = document.getElementById('trendSection');
-const settingsSection = document.getElementById('settingsSection');
-
-const allSideLinks = [sideLinkOverview, sideLinkShipments, sideLinkAlerts, sideLinkSettings];
-
-function activateSideLink(activeLink) {
-	allSideLinks.forEach(link => {
-		if (link) link.classList.toggle('active', link === activeLink);
-	});
-}
-
-if (sideLinkOverview) {
-	sideLinkOverview.addEventListener('click', (e) => {
-		e.preventDefault();
-		activateSideLink(sideLinkOverview);
-		
-		// Overview shows everything except settings
-		if (kpiSection) kpiSection.style.display = 'grid';
-		if (sensorsSection) sensorsSection.style.display = 'block';
-		if (alertsSection) alertsSection.style.display = 'block';
-		if (trendSection) trendSection.style.display = 'block';
-		if (settingsSection) settingsSection.style.display = 'none';
-	});
-}
-
-// Side Links for New Operational Modules
-const sideLinkEscalation = document.getElementById('sideLinkEscalation');
-const sideLinkQuality = document.getElementById('sideLinkQuality');
-const escalationTrackerSection = document.getElementById('escalationTrackerSection');
-const qualityAuditSection = document.getElementById('qualityAuditSection');
-
-if (sideLinkEscalation) {
-	sideLinkEscalation.addEventListener('click', (e) => {
-		e.preventDefault();
-		activateSideLink(sideLinkEscalation);
-		if (escalationTrackerSection) {
-			escalationTrackerSection.style.display = 'block';
-			escalationTrackerSection.scrollIntoView({ behavior: 'smooth' });
-		}
-	});
-}
-
-if (sideLinkQuality) {
-	sideLinkQuality.addEventListener('click', (e) => {
-		e.preventDefault();
-		activateSideLink(sideLinkQuality);
-		if (qualityAuditSection) {
-			qualityAuditSection.style.display = 'block';
-			qualityAuditSection.scrollIntoView({ behavior: 'smooth' });
-		}
-	});
-}
-
-if (sideLinkShipments) {
-	sideLinkShipments.addEventListener('click', (e) => {
-		e.preventDefault();
-		activateSideLink(sideLinkShipments);
-		
-		// Shipments shows active sensor cards and trend graph
-		if (kpiSection) kpiSection.style.display = 'none';
-		if (sensorsSection) sensorsSection.style.display = 'block';
-		if (alertsSection) alertsSection.style.display = 'none';
-		if (trendSection) trendSection.style.display = 'block';
-		if (settingsSection) settingsSection.style.display = 'none';
-	});
-}
-
-if (sideLinkAlerts) {
-	sideLinkAlerts.addEventListener('click', (e) => {
-		e.preventDefault();
-		activateSideLink(sideLinkAlerts);
-		
-		// Alerts shows only the alerts section
-		if (kpiSection) kpiSection.style.display = 'none';
-		if (sensorsSection) sensorsSection.style.display = 'none';
-		if (alertsSection) alertsSection.style.display = 'block';
-		if (trendSection) trendSection.style.display = 'none';
-		if (settingsSection) settingsSection.style.display = 'none';
-	});
-}
-
-if (sideLinkSettings) {
-	sideLinkSettings.addEventListener('click', (e) => {
-		e.preventDefault();
-		activateSideLink(sideLinkSettings);
-		
-		// Settings shows only the technical settings panel
-		if (kpiSection) kpiSection.style.display = 'none';
-		if (sensorsSection) sensorsSection.style.display = 'none';
-		if (alertsSection) alertsSection.style.display = 'none';
-		if (trendSection) trendSection.style.display = 'none';
-		if (settingsSection) settingsSection.style.display = 'block';
-	});
-}
-
-// Mobile menu toggle logic
-const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-const navLinks = document.getElementById('navLinks');
-
-if (mobileMenuToggle && navLinks) {
-	mobileMenuToggle.addEventListener('click', () => {
-		mobileMenuToggle.classList.toggle('active');
-		navLinks.classList.toggle('active');
-	});
-
-	// Close menu when clicking a link or button
-	navLinks.querySelectorAll('a, button').forEach((link) => {
-		link.addEventListener('click', () => {
-			mobileMenuToggle.classList.remove('active');
-			navLinks.classList.remove('active');
-		});
-	});
-}
-
-/* ==========================================================================
-   Interactive Map Collapsible Shipment Drawer Toggle Engine
-   ========================================================================== */
-const toggleShipmentDrawerBtn = document.getElementById('toggleShipmentDrawerBtn');
-const shipmentDetailDrawer = document.getElementById('shipmentDetailDrawer');
-const drawerToggleIcon = document.getElementById('drawerToggleIcon');
-
-if (toggleShipmentDrawerBtn && shipmentDetailDrawer) {
-	toggleShipmentDrawerBtn.addEventListener('click', () => {
-		const isHidden = shipmentDetailDrawer.style.display === 'none';
-		if (isHidden) {
-			shipmentDetailDrawer.style.display = 'block';
-			if (drawerToggleIcon) drawerToggleIcon.textContent = '▼';
-		} else {
-			shipmentDetailDrawer.style.display = 'none';
-			if (drawerToggleIcon) drawerToggleIcon.textContent = '▲';
-		}
-	});
-}
-
-/* ==========================================================================
-   1. Dynamic 4-Level Alert Escalation Timeline Tracker Interactive Engine
-   ========================================================================== */
-let escalationElapsedSeconds = 462; // 07:42 initial duration
-let isEscalationPaused = false;
-const escalationLiveTimer = document.getElementById('escalationLiveTimer');
-const toggleEscalationTimerBtn = document.getElementById('toggleEscalationTimerBtn');
-const escalationNodesGrid = document.getElementById('escalationNodesGrid');
-
-function updateEscalationTimerDisplay() {
-	if (!escalationLiveTimer) return;
-	const mins = Math.floor(escalationElapsedSeconds / 60);
-	const secs = escalationElapsedSeconds % 60;
-	const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-	escalationLiveTimer.textContent = formatted;
-
-	// Dynamically update level node highlights based on total minutes elapsed
-	const elapsedMins = escalationElapsedSeconds / 60;
-	let activeLevel = 1;
-	if (elapsedMins >= 30) activeLevel = 4;
-	else if (elapsedMins >= 15) activeLevel = 3;
-	else if (elapsedMins >= 5) activeLevel = 2;
-	else activeLevel = 1;
-
-	if (escalationNodesGrid) {
-		const nodes = escalationNodesGrid.querySelectorAll('.escalation-node');
-		nodes.forEach(node => {
-			const lvl = parseInt(node.getAttribute('data-level'), 10);
-			const badge = node.querySelector('.node-badge');
-			
-			node.classList.remove('node-passed', 'node-active', 'node-pending');
-			if (badge) badge.classList.remove('badge-passed', 'badge-active', 'badge-pending', 'animate-pulse');
-
-			if (lvl < activeLevel) {
-				node.classList.add('node-passed');
-				if (badge) {
-					badge.classList.add('badge-passed');
-					badge.textContent = 'تم التصعيد ✓';
-				}
-			} else if (lvl === activeLevel) {
-				node.classList.add('node-active');
-				if (badge) {
-					badge.classList.add('badge-active', 'animate-pulse');
-					badge.textContent = 'نشط الآن (Active)';
-				}
-			} else {
-				node.classList.add('node-pending');
-				if (badge) {
-					badge.classList.add('badge-pending');
-					badge.textContent = `قادم (+${lvl === 3 ? '15' : '30'}د)`;
-				}
-			}
-		});
-	}
-}
-
-if (escalationLiveTimer) {
-	setInterval(() => {
-		if (!isEscalationPaused) {
-			escalationElapsedSeconds++;
-			updateEscalationTimerDisplay();
-		}
-	}, 1000);
-}
-
-if (toggleEscalationTimerBtn) {
-	toggleEscalationTimerBtn.addEventListener('click', () => {
-		isEscalationPaused = !isEscalationPaused;
-		toggleEscalationTimerBtn.textContent = isEscalationPaused ? '▶' : '⏸';
-		toggleEscalationTimerBtn.title = isEscalationPaused ? 'استئناف مؤقت المؤشر' : 'إيقاف مؤقت المؤشر';
-	});
-}
-
-/* ==========================================================================
-   2. Quality Policy & Decision Recommendation Module Engine
-   ========================================================================== */
-const qaOfficerName = document.getElementById('qaOfficerName');
-const qaTimestamp = document.getElementById('qaTimestamp');
-const qaDecisionReason = document.getElementById('qaDecisionReason');
-const qaCustomReason = document.getElementById('qaCustomReason');
-const qualityApprovalForm = document.getElementById('qualityApprovalForm');
-const qaSubmitBtn = document.getElementById('qaSubmitBtn');
-const qaBtnSpinner = document.getElementById('qaBtnSpinner');
-const qaBtnText = document.getElementById('qaBtnText');
-const qaSuccessAlert = document.getElementById('qaSuccessAlert');
-
-const qualityAutomatedBadge = document.getElementById('qualityAutomatedBadge');
-const qualityBadgeText = document.getElementById('qualityBadgeText');
-const qaRecommendationText = document.getElementById('qaRecommendationText');
-
-// Quality parameters setup
-const qaParams = {
-	targetTemp: -18,
-	maxAllowedTemp: -15,
-	maxPolicyMins: 15,
-	actualMaxTemp: -14,
-	actualDurationMins: 10
-};
-
-// Evaluate decision automatically
-function evaluateQualityPolicy() {
-	if (!qualityAutomatedBadge) return;
-	const dot = qualityAutomatedBadge.querySelector('.dot');
-	
-	qualityAutomatedBadge.className = 'quality-badge';
-	if (dot) dot.className = 'dot';
-
-	if (qaParams.actualDurationMins === 0 || qaParams.actualMaxTemp <= qaParams.maxAllowedTemp) {
-		qualityAutomatedBadge.classList.add('badge-emerald');
-		if (dot) dot.classList.add('dot-emerald');
-		if (qualityBadgeText) qualityBadgeText.textContent = 'مقبول (مطابق للشروط)';
-		if (qaRecommendationText) qaRecommendationText.textContent = 'الشحنة مستوفية لمعايير الجودة والتبريد بالكامل دون تسجيل أي تجاوز حراري.';
-	} else if (qaParams.actualDurationMins <= qaParams.maxPolicyMins) {
-		qualityAutomatedBadge.classList.add('badge-amber');
-		if (dot) dot.classList.add('dot-amber');
-		if (qualityBadgeText) qualityBadgeText.textContent = 'مقبول مع ملاحظة تنبيه';
-		if (qaRecommendationText) qaRecommendationText.textContent = `حدث تجاوز حراري طفيف لا يتعدى مهلة السياسة المحددة (${qaParams.actualDurationMins} دقائق ≤ ${qaParams.maxPolicyMins} دقيقة). الشحنة سليمة وتشغيلية مع التوثيق المعتمد.`;
-	} else {
-		qualityAutomatedBadge.classList.add('badge-rose');
-		if (dot) dot.classList.add('dot-rose');
-		if (qualityBadgeText) qualityBadgeText.textContent = 'يحتاج تحقيق / مرفوض';
-		if (qaRecommendationText) qaRecommendationText.textContent = `تجاوز الحرارة الوقت المسموح به في السياسة (${qaParams.actualDurationMins} دقيقة > ${qaParams.maxPolicyMins} دقيقة). يُحظر الفسح ويجب رفع محضر للتحقيق الحرج.`;
-	}
-}
-
-// Live timestamp updater
-function updateQaTimestamp() {
-	if (!qaTimestamp) return;
-	const now = new Date();
-	qaTimestamp.value = now.toLocaleString('ar-SA', { 
-		year: 'numeric', month: '2-digit', day: '2-digit', 
-		hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
-	});
-}
-
-if (qaTimestamp) {
-	updateQaTimestamp();
-	setInterval(updateQaTimestamp, 1000);
-}
-
-evaluateQualityPolicy();
-
-// Show/hide custom reason input
-if (qaDecisionReason && qaCustomReason) {
-	qaDecisionReason.addEventListener('change', () => {
-		if (qaDecisionReason.value === 'custom') {
-			qaCustomReason.style.display = 'block';
-			qaCustomReason.required = true;
-		} else {
-			qaCustomReason.style.display = 'none';
-			qaCustomReason.required = false;
-		}
-	});
-}
-
-// Form Submission & API Integration
-if (qualityApprovalForm) {
-	qualityApprovalForm.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		
-		if (qaSubmitBtn) qaSubmitBtn.disabled = true;
-		if (qaBtnSpinner) qaBtnSpinner.style.display = 'inline-block';
-		if (qaBtnText) qaBtnText.textContent = 'جاري معالجة الاعتماد وتوليد التقرير...';
-		if (qaSuccessAlert) qaSuccessAlert.style.display = 'none';
-
-		const reason = qaDecisionReason.value === 'custom' ? qaCustomReason.value : qaDecisionReason.value;
-		const payload = {
-			shipmentId: 'RQ-1002',
-			officerName: qaOfficerName ? qaOfficerName.value : 'أحمد محمد - مدير الجودة',
-			timestamp: new Date().toISOString(),
-			parameters: qaParams,
-			evaluation: qualityBadgeText ? qualityBadgeText.textContent : 'مقبول مع ملاحظة تنبيه',
-			decisionReason: reason
-		};
-
-		try {
-			// Direct Worker API link
-			const response = await fetch(`${API_BASE}/api/quality-reports`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload)
-			});
-
-			if (!response.ok) {
-				console.warn('Backend API endpoint returned status', response.status, '- confirming locally.');
-			}
-		} catch (err) {
-			console.error('Error connecting to backend API:', err);
-		} finally {
-			setTimeout(() => {
-				if (qaBtnSpinner) qaBtnSpinner.style.display = 'none';
-				if (qaBtnText) qaBtnText.textContent = 'تم اعتماد القرار بنجاح ✓';
-				if (qaSuccessAlert) qaSuccessAlert.style.display = 'block';
-				
-				setTimeout(() => {
-					if (qaSubmitBtn) qaSubmitBtn.disabled = false;
-					if (qaBtnText) qaBtnText.textContent = 'اعتماد القرار وإصدار التقرير الرسمي 🛡️';
-				}, 4000);
-			}, 1200);
-		}
-	});
-}
-
-

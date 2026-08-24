@@ -3,678 +3,1409 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0D1B2A" />
-  <title>Raquib | رقيب - Smart Cold Chain Monitoring</title>
+  <meta name="theme-color" content="#020408" />
+  <meta name="description" content="رقيب (RAQUIB) - المنصة الوطنية الذكية لمراقبة سلاسل الإمداد المبردة والمستودعات والأسطول اللوجستي لحظياً." />
+  <title>رقيب | RAQUIB - Smart Cold Chain & Fleet Telemetry</title>
+  
+  <!-- Modern Typography: Tajawal + IBM Plex Sans Arabic + Outfit + JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet GIS Real Map Library CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="cyber-industrial-theme">
+  <!-- Ambient background glow elements -->
+  <div class="ambient-glow glow-top-right" aria-hidden="true"></div>
+  <div class="ambient-glow glow-top-left" aria-hidden="true"></div>
+  <div class="ambient-grid-overlay" aria-hidden="true"></div>
+
   <div class="page-shell">
-    <header class="navbar">
+    <!-- Main Top Navigation -->
+    <header class="navbar" id="navbar">
       <div class="container navbar-inner">
-        <a class="brand" href="#home" aria-label="Raquib رقيب">
-          <img class="brand-logo" src="logo.png" alt="Raquib logo" width="44" height="44" />
-          <span>Raquib | رقيب</span>
+        <a class="brand" href="#home" id="brandHomeLink" aria-label="رقيب - الرئيسية">
+          <div class="brand-logo-frame">
+            <img class="brand-logo" src="logo.png" alt="شعار رقيب" width="44" height="44" />
+            <span class="logo-pulse-ring"></span>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">رَقِـيـب</span>
+            <span class="brand-subtitle">RAQUIB TELEMETRY</span>
+          </div>
         </a>
-        <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Toggle menu">
+
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="القائمة الرئيسية" aria-expanded="false">
           <span class="toggle-bar"></span>
           <span class="toggle-bar"></span>
           <span class="toggle-bar"></span>
         </button>
-        <nav class="nav-links" id="navLinks" aria-label="Main navigation">
-          <a href="#home">الرئيسية</a>
-          <a href="#solutions" data-solution-target="services">الخدمات</a>
-          <a href="#solutions" data-solution-target="rental">التأجير</a>
-          <a href="#downloadApp" id="openDownloadModalBtn">تطبيق الهاتف 📱</a>
-          <a href="#authSection" class="btn btn-primary btn-nav-join" id="navJoinBtn">انضم إلينا 🚀</a>
+
+        <nav class="nav-links" id="navLinks" aria-label="التنقل الرئيسي">
+          <a href="#home" class="nav-link active" id="navHomeLink">الرئيسية</a>
+          <a href="#features" class="nav-link" id="navFeaturesLink">المميزات والمعمارية</a>
+          <a href="#hardware" class="nav-link" id="navHardwareLink">العتاد والتأجير</a>
+          <a href="#standards" class="nav-link" id="navStandardsLink">معايير الامتثال</a>
+          <button class="btn-tactical btn-tactical-primary" id="navOpenDashboardBtn" type="button">
+            <span>مركز العمليات الحي ⚡</span>
+            <span class="btn-glow"></span>
+          </button>
         </nav>
       </div>
     </header>
 
-    <main>
-      <section id="homeView" class="view active">
-        <section class="hero section-anchor" id="home">
+    <main id="mainContent">
+      <!-- ============================================================
+           VIEW 1: PUBLIC LANDING PORTAL
+           ============================================================ -->
+      <div id="homeView" class="view active">
+        <!-- 1. Hero Section (Cyber-Industrial Mission Control Preview) -->
+        <section class="hero-section section-anchor" id="home">
           <div class="container hero-grid">
-            <div>
-              <div class="eyebrow">مراقبة ذكية لسلاسل الإمداد الحساسة</div>
-              <h1>نراقب، ننبه، نحمي - نظام ذكي لمراقبة سلاسل الإمداد الحساسة</h1>
-              <p>
-                Raquib (رقيب) يضع طبقة مراقبة متقدمة لعمليات النقل المبرد واللوجستيات الدوائية والغذائية.
-                نتابع الحرارة والرطوبة والاهتزاز لحظة بلحظة لنحافظ على سلامة الشحنة من نقطة الانطلاق حتى التسليم.
+            
+            <!-- Left Column (Text & Mission Actions) -->
+            <div class="hero-content">
+              <div class="hero-badge-strip">
+                <span class="status-beacon beacon-emerald"></span>
+                <span class="badge-text">نظام مراقبة وتحكم صناعي فوري • Industrial IoT Telemetry</span>
+                <span class="badge-tag">SFDA Ready</span>
+              </div>
+
+              <h1 class="hero-title">
+                نراقب، ننبه، نحمي
+                <span class="hero-highlight">سلاسل الإمداد المبردة</span>
+                بأعلى دقة وموثوقية
+              </h1>
+
+              <p class="hero-description">
+                منصة <strong>رقيب</strong> توفر طبقة حماية رقمية متقدمة للأدوية، الأغذية الحساسة، والشحنات المبردة.
+                متابعة لحظية لدرجات الحرارة والرطوبة والاهتزاز، مع محرك تصعيد آلي رباعي المستويات وتدقيق فوري للجودة والفسح.
               </p>
+
               <div class="hero-actions">
-                <a href="#authSection" class="btn btn-primary" id="heroJoinBtn">انضم لمركز العمليات 🚀</a>
-                <button class="btn btn-secondary" id="exploreSolutions" type="button" data-solution-target="services">الخدمات</button>
-                <span class="status-pill pill-live">Live Monitoring / مراقبة مباشرة</span>
+                <button class="btn-tactical btn-tactical-primary btn-lg" id="heroControlCenterBtn" type="button">
+                  <span class="btn-icon">⚡</span>
+                  <span>دخول مركز العمليات الحي</span>
+                  <span class="btn-glow"></span>
+                </button>
+                
+                <button class="btn-tactical btn-tactical-glass btn-lg" id="heroExploreHardwareBtn" type="button">
+                  <span class="btn-icon">📦</span>
+                  <span>باقات العتاد والحلول</span>
+                </button>
+              </div>
+
+              <!-- Live Stats Mini Ribbon -->
+              <div class="hero-stats-ribbon">
+                <div class="stat-item">
+                  <div class="stat-number tabular-mono" id="statLiveSensors">2,480+</div>
+                  <div class="stat-label">حساس نشط لحظياً</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                  <div class="stat-number tabular-mono" id="statAccuracy">99.98%</div>
+                  <div class="stat-label">دقة قياس التيليمتري</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                  <div class="stat-number tabular-mono" id="statEscalationSpeed">&lt; 1.2s</div>
+                  <div class="stat-label">سرعة إطلاق التنبيه</div>
+                </div>
               </div>
             </div>
 
-            <aside class="hero-card" aria-label="Product preview card">
-              <div class="hero-metrics">
-                <div class="mini-panel">
-                  <div class="label">الشحنة الحالية</div>
-                  <div class="value">
-                    <strong id="heroShipmentId">#RQ-000125</strong>
-                    <span class="status-pill pill-purple">AI Assisted</span>
+            <!-- Right Column (Interactive Holographic Telemetry HUD Card) -->
+            <div class="hero-visual">
+              <div class="hud-card-glass">
+                <!-- HUD Card Header -->
+                <div class="hud-card-header">
+                  <div class="hud-header-left">
+                    <span class="hud-indicator pulse-emerald"></span>
+                    <div class="hud-unit-info">
+                      <span class="hud-unit-id">UNIT // RQ-1002</span>
+                      <span class="hud-unit-cargo">شحنة إنسولين مبرد (Humulin)</span>
+                    </div>
+                  </div>
+                  <div class="hud-header-right">
+                    <span class="hud-tag-live">LIVE TELEMETRY</span>
                   </div>
                 </div>
-                <div class="mini-panel">
-                  <div class="label">درجة الحرارة الآن</div>
-                  <div class="value">
-                    <!-- Week 5: هنا سيتم ربط قيمة درجة الحرارة ببيانات API مباشرة بدل القيمة الثابتة الحالية -->
-                    <strong id="heroTempValue">4°C</strong>
-                    <span class="status-pill pill-safe">Safe / آمن</span>
+
+                <!-- HUD Central Gauge & Live Waveform -->
+                <div class="hud-telemetry-body">
+                  <div class="hud-metric-row">
+                    <div class="hud-metric-card metric-primary">
+                      <div class="metric-top">
+                        <span class="metric-icon">🌡️</span>
+                        <span class="metric-name">درجة الحرارة الحالية</span>
+                      </div>
+                      <div class="metric-main-value">
+                        <span class="val tabular-mono" id="heroLiveTemp">4.2</span>
+                        <span class="unit">°C</span>
+                      </div>
+                      <div class="metric-bar-container">
+                        <div class="metric-safe-bounds">النطاق الآمن: 2.0°C - 8.0°C</div>
+                        <div class="metric-bar-track">
+                          <div class="metric-bar-fill" id="heroTempBar" style="width: 42%;"></div>
+                        </div>
+                      </div>
+                      <div class="metric-status-badge status-safe">
+                        <span>✓ مستقر وآمن (Safe)</span>
+                      </div>
+                    </div>
+
+                    <div class="hud-metric-card metric-secondary">
+                      <div class="metric-top">
+                        <span class="metric-icon">💧</span>
+                        <span class="metric-name">الرطوبة النسبية</span>
+                      </div>
+                      <div class="metric-main-value">
+                        <span class="val tabular-mono" id="heroLiveHumidity">45</span>
+                        <span class="unit">%</span>
+                      </div>
+                      <div class="metric-status-badge status-stable">
+                        <span>مثالي (Stable)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Secondary Sub-Metrics Grid -->
+                  <div class="hud-submetrics-grid">
+                    <div class="submetric-item">
+                      <span class="submetric-label">مستوى الاهتزاز / الصدمات:</span>
+                      <strong class="submetric-val tabular-mono text-emerald" id="heroLiveVibration">0.02 G (مستقر)</strong>
+                    </div>
+                    <div class="submetric-item">
+                      <span class="submetric-label">حالة قفل الحاوية:</span>
+                      <strong class="submetric-val text-cyan">🔒 مؤمن بالكامل (Sealed)</strong>
+                    </div>
+                    <div class="submetric-item">
+                      <span class="submetric-label">الموقع الجغرافي:</span>
+                      <strong class="submetric-val text-white">طريق جازان - مستودع الرياض</strong>
+                    </div>
+                    <div class="submetric-item">
+                      <span class="submetric-label">سرعة التحديث:</span>
+                      <strong class="submetric-val tabular-mono text-emerald">كل 3 ثوانٍ</strong>
+                    </div>
+                  </div>
+
+                  <!-- Animated Laser Scanner Line -->
+                  <div class="hud-laser-scanner">
+                    <div class="laser-beam"></div>
                   </div>
                 </div>
-                <div class="mini-panel">
-                  <div class="label">حالة التنبيه</div>
-                  <div class="value">
-                    <strong id="heroAlertValue">0 Alerts</strong>
-                    <span class="status-pill pill-live">All Systems Green</span>
+
+                <!-- HUD Footer Quick Action -->
+                <div class="hud-card-footer">
+                  <div class="footer-telemetry-status">
+                    <span class="signal-bars">
+                      <span class="bar bar-1"></span>
+                      <span class="bar bar-2"></span>
+                      <span class="bar bar-3"></span>
+                      <span class="bar bar-4"></span>
+                    </span>
+                    <span>متصل بالخادم السحابي (Cloudflare Edge D1)</span>
                   </div>
+                  <button class="btn-hud-inspect" id="btnSimulateTempWarning" type="button" title="محاكاة تغير في درجة الحرارة لاختبار استجابة النظام">
+                    <span>⚡ محاكاة قراءة</span>
+                  </button>
                 </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 2. Architectural Pillars & Core Features Section -->
+        <section class="features-section section-anchor" id="features">
+          <div class="container">
+            <div class="section-header-center">
+              <span class="section-kicker">المعمارية والقدرات التشغيلية</span>
+              <h2 class="section-title">أربع ركائز هندسية لحماية سلاسل التبريد الحرجة</h2>
+              <p class="section-subtitle">
+                تم بناء نظام رقيب ليتجاوز مجرد التسجيل السلبي للبيانات، ليصبح منظومة استباقية تصنع القرار وتفعل إجراءات السلامة لحظياً.
+              </p>
+            </div>
+
+            <div class="features-grid-asymmetric">
+              <!-- Pillar 1 -->
+              <article class="feature-card feature-card-glow-cyan">
+                <div class="card-glow-top"></div>
+                <div class="card-icon-frame">
+                  <span class="card-icon">📡</span>
+                  <span class="card-number tabular-mono">01</span>
+                </div>
+                <h3 class="card-title">المراقبة اللحظية الشاملة (IoT Telemetry)</h3>
+                <p class="card-desc">
+                  قراءة متزامنة وفائقة الدقة لدرجات الحرارة، الرطوبة، الصدمات والاهتزاز عبر مستشعرات صناعية مثبتة على الرفوف وداخل شاحنات التبريد.
+                </p>
+                <ul class="card-bullets">
+                  <li><span>✦</span> تتبع مباشر بمعدل تحديث يقل عن 3 ثوانٍ.</li>
+                  <li><span>✦</span> عتبات أمان مخصصة لكل نوع منتج (أدوية، أمصال، لحوم، أغذية).</li>
+                  <li><span>✦</span> حفظ كامل لسجل التيليمتري في قاعدة بيانات SQL موزعة سحابياً.</li>
+                </ul>
+              </article>
+
+              <!-- Pillar 2 -->
+              <article class="feature-card feature-card-glow-crimson">
+                <div class="card-glow-top"></div>
+                <div class="card-icon-frame">
+                  <span class="card-icon">🚨</span>
+                  <span class="card-number tabular-mono">02</span>
+                </div>
+                <h3 class="card-title">محرك التصعيد الهرمي للحوادث (4-Tier Escalation)</h3>
+                <p class="card-desc">
+                  خوارزمية ذكية تحسب زمن الانحراف الحراري التراكمي وتصعّد التنبيه تلقائياً عبر 4 مستويات زمنية محددة الصلاحيات.
+                </p>
+                <ul class="card-bullets">
+                  <li><span>✦</span> <strong>المستوى 1 (0-5د):</strong> إشعار فوري للسائق ومسؤول المستودع.</li>
+                  <li><span>✦</span> <strong>المستوى 2 (+5د):</strong> تصعيد لمدير الأسطول والعمليات.</li>
+                  <li><span>✦</span> <strong>المستوى 3 (+15د):</strong> إشعار مدير عام الجودة والامتثال.</li>
+                  <li><span>✦</span> <strong>المستوى 4 (+30د):</strong> نداء طوارئ وحظر آلي لإجراءات الفسح.</li>
+                </ul>
+              </article>
+
+              <!-- Pillar 3 -->
+              <article class="feature-card feature-card-glow-emerald">
+                <div class="card-glow-top"></div>
+                <div class="card-icon-frame">
+                  <span class="card-icon">🛡️</span>
+                  <span class="card-number tabular-mono">03</span>
+                </div>
+                <h3 class="card-title">محرك تدقيق الجودة والفسح النهائي (Quality Engine)</h3>
+                <p class="card-desc">
+                  مطابقة آلية لبيانات التجاوز مع سياسة المنتج المعتمدة لإصدار توصيات الفسح الرسمية وتقارير التدقيق الفني الموثقة.
+                </p>
+                <ul class="card-bullets">
+                  <li><span>✦</span> احتساب التجاوز الطفيف المسموح به زمنياً بدقة.</li>
+                  <li><span>✦</span> توقيع إلكتروني وتوثيق معتمد لمسؤول الجودة.</li>
+                  <li><span>✦</span> إصدار شهادة مطابقة فورية لسلسلة التبريد.</li>
+                </ul>
+              </article>
+
+              <!-- Pillar 4 -->
+              <article class="feature-card feature-card-glow-amber">
+                <div class="card-glow-top"></div>
+                <div class="card-icon-frame">
+                  <span class="card-icon">🗺️</span>
+                  <span class="card-number tabular-mono">04</span>
+                </div>
+                <h3 class="card-title">الرادار التكتيكي وتتبع الأسطول (GIS Radar)</h3>
+                <p class="card-desc">
+                  عرض حي لمسارات حركة الشاحنات بين المدن ونقاط التسليم، مع درج تفاعلي يكشف حالة كل شاحنة فوراً.
+                </p>
+                <ul class="card-bullets">
+                  <li><span>✦</span> مؤشرات GPS نشطة ونبضات لونية للحالات الطارئة.</li>
+                  <li><span>✦</span> حساب دقيق لتوقيت الوصول المتوقع (ETA).</li>
+                  <li><span>✦</span> ربط مباشر بين بيانات الحساس وخط سير المركبة.</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Hardware Rental & Ecosystem Hub Section -->
+        <section class="hardware-section section-anchor" id="hardware">
+          <div class="container">
+            <div class="section-header-split">
+              <div>
+                <span class="section-kicker">العتاد والحلول التشغيلية</span>
+                <h2 class="section-title">أجهزة استشعار وقارئات باركود صناعية جاهزة للنشر</h2>
+                <p class="section-subtitle">
+                  نوفر العتاد الذكي بنظام التأجير الشامل أو الشراء المباشر لتمكين منشأتك من الامتثال الفوري دون تكاليف تأسيسية باهظة.
+                </p>
+              </div>
+              
+              <div class="hardware-tabs" role="tablist" aria-label="باقات العتاد والخدمات">
+                <button class="tab-pill active" id="tabHardwareAll" type="button" data-filter="all">جميع الحلول</button>
+                <button class="tab-pill" id="tabHardwareSensors" type="button" data-filter="sensors">الحساسات والـ Gateways</button>
+                <button class="tab-pill" id="tabHardwareScanners" type="button" data-filter="scanners">قارئات الباركود</button>
+              </div>
+            </div>
+
+            <div class="hardware-cards-grid">
+              <!-- Hardware Item 1 -->
+              <article class="hardware-card featured-hardware" data-category="sensors">
+                <div class="hardware-badge">الأعلى طلباً في قطاع الأدوية</div>
+                <div class="hardware-visual">
+                  <div class="hardware-icon-box">🌡️</div>
+                  <div class="hardware-tag">Raquib Gateway Pro</div>
+                </div>
+                <h3 class="hardware-name">بوابة استشعار الحرارة والرطوبة اللاسلكية</h3>
+                <p class="hardware-spec">
+                  وحدة مراقبة بيئية متقدمة بدقة قياس ±0.1°C، تدعم الاتصال السحابي عبر 4G/LTE وبطارية احتياطية تعمل حتى 72 ساعة في انقطاع التيار.
+                </p>
+                <div class="hardware-features-list">
+                  <span>✓ مدى حراري: -40°C إلى +85°C</span>
+                  <span>✓ مقاومة تامة للماء والغبار (IP67)</span>
+                  <span>✓ معايرة معتمدة بشهادة NIST</span>
+                </div>
+                <div class="hardware-pricing-footer">
+                  <div class="price-box">
+                    <span class="price-val tabular-mono">780</span>
+                    <span class="price-currency">ر.س / شهر</span>
+                  </div>
+                  <a href="#authSection" class="btn-tactical btn-tactical-primary">طلب العتاد</a>
+                </div>
+              </article>
+
+              <!-- Hardware Item 2 -->
+              <article class="hardware-card" data-category="scanners">
+                <div class="hardware-badge badge-cyan">جاهز للتشغيل الميداني</div>
+                <div class="hardware-visual">
+                  <div class="hardware-icon-box">📷</div>
+                  <div class="hardware-tag">Smart Rugged Scanner</div>
+                </div>
+                <h3 class="hardware-name">قارئ باركود صناعي محمول (Rugged 2D)</h3>
+                <p class="hardware-spec">
+                  جهاز مسح محمول متين يدعم قراءة كافة الرموز (1D/2D/QR/DataMatrix) في درجات التبريد القصوى ومربوط بمنصة رقيب مباشرة.
+                </p>
+                <div class="hardware-features-list">
+                  <span>✓ مسح فائق السرعة &lt; 0.05 ثانية</span>
+                  <span>✓ شاشة لمس مضادة للرطوبة وتعمل بالقفازات</span>
+                  <span>✓ مقاوم للسقوط من ارتفاع 2 متر على الخرسانة</span>
+                </div>
+                <div class="hardware-pricing-footer">
+                  <div class="price-box">
+                    <span class="price-val tabular-mono">450</span>
+                    <span class="price-currency">ر.س / شهر</span>
+                  </div>
+                  <a href="#authSection" class="btn-tactical btn-tactical-glass">طلب العتاد</a>
+                </div>
+              </article>
+
+              <!-- Hardware Item 3 -->
+              <article class="hardware-card" data-category="sensors">
+                <div class="hardware-badge badge-purple">حزمة لوجستية متكاملة</div>
+                <div class="hardware-visual">
+                  <div class="hardware-icon-box">🚚</div>
+                  <div class="hardware-tag">Cold-Chain Fleet Kit</div>
+                </div>
+                <h3 class="hardware-name">حزمة تتبع ومراقبة الشاحنات المبردة</h3>
+                <p class="hardware-spec">
+                  طقم متكامل يتضمن جهاز تتبع GPS مع 4 مستشعرات حرارة وصدمات لاسلكية ومستشعر لفتح وإغلاق أبواب الحاوية.
+                </p>
+                <div class="hardware-features-list">
+                  <span>✓ تتبع مسار وتيليمتري حي في الخريطة</span>
+                  <span>✓ تنبيه فوري عند فتح باب الشاحنة</span>
+                  <span>✓ ربط وتثبيت فوري بدون تمديدات معقدة</span>
+                </div>
+                <div class="hardware-pricing-footer">
+                  <div class="price-box">
+                    <span class="price-val tabular-mono">1,250</span>
+                    <span class="price-currency">ر.س / شهر</span>
+                  </div>
+                  <a href="#authSection" class="btn-tactical btn-tactical-glass">طلب العتاد</a>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Compliance, Standards & Trust Section -->
+        <section class="standards-section section-anchor" id="standards">
+          <div class="container">
+            <div class="section-header-center">
+              <span class="section-kicker">الامتثال والموثوقية القياسية</span>
+              <h2 class="section-title">متوافق مع المعايير السعودية والدولية لسلاسل التبريد</h2>
+            </div>
+
+            <div class="standards-badges-grid">
+              <div class="standard-badge-card">
+                <div class="standard-icon">🏛️</div>
+                <h4>الهيئة العامة للغذاء والدواء (SFDA)</h4>
+                <p>مطابقة تامة لمتطلبات تتبع وتخزين الأدوية والمستحضرات الحيوية والأغذية المبردة.</p>
+              </div>
+              <div class="standard-badge-card">
+                <div class="standard-icon">💊</div>
+                <h4>ممارسات التوزيع الجيد (GDP)</h4>
+                <p>توثيق مستمر لبيانات النقل والتخزين لضمان عدم انقطاع سلسلة التبريد الدوائية.</p>
+              </div>
+              <div class="standard-badge-card">
+                <div class="standard-icon">🔒</div>
+                <h4>أمن البيانات والسيادة السحابية</h4>
+                <p>تشفير كامل للاتصالات عبر SSL/TLS وتخزين آمن ومحمي ضد التلاعب.</p>
+              </div>
+              <div class="standard-badge-card">
+                <div class="standard-icon">📜</div>
+                <h4>تقارير تدقيق آلية (Audit Logs)</h4>
+                <p>إمكانية استخراج تقارير الامتثال الرسمية بضغطة زر لتقديمها للمفتشين والجهات الرقابية.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. Authentication Station & Operations Gateway -->
+        <section class="auth-section section-anchor" id="authSection">
+          <div class="container">
+            <div class="auth-wrapper-centered">
+              
+              <div class="auth-header">
+                <div class="auth-icon-ring">
+                  <span class="auth-main-icon">🛡️</span>
+                </div>
+                <span class="section-kicker">المصادقة والوصول الآمن</span>
+                <h2 class="auth-title">مركز مصادقة الموظفين والاتصال الحي</h2>
+                <p class="auth-subtitle">
+                  سجّل دخولك برمز الموظف أو رقم المعرّف للوصول للوحة العمليات والبيانات الحية وتسوية التنبيهات.
+                </p>
+              </div>
+
+              <div class="auth-card-glass">
+                <form id="loginForm" class="auth-form">
+                  <div class="form-group">
+                    <label for="employeeBarcode" class="form-label">
+                      <span>رمز الموظف / المعرّف (Employee Barcode / ID)</span>
+                      <span class="label-hint">مثال: EMP-101 أو USR-101</span>
+                    </label>
+                    <div class="input-frame">
+                      <span class="input-icon">🔍</span>
+                      <input 
+                        type="text" 
+                        id="employeeBarcode" 
+                        class="form-input-cyber" 
+                        placeholder="أدخل رمز الموظف هنا (مثل: EMP-101)" 
+                        required 
+                        autocomplete="off" 
+                        value="EMP-101"
+                      />
+                    </div>
+                  </div>
+
+                  <div id="loginError" class="auth-error-banner" style="display: none;">
+                    <span class="error-icon">⚠️</span>
+                    <span id="loginErrorText">رمز الموظف غير مسجل، يرجى المحاولة مجدداً أو استخدام البيانات التجريبية.</span>
+                  </div>
+
+                  <button type="submit" class="btn-tactical btn-tactical-primary btn-block btn-lg" id="submitLoginBtn">
+                    <span class="btn-spinner" id="loginSpinner" style="display: none;"></span>
+                    <span id="loginBtnText">تسجيل الدخول وفتح مركز العمليات 🚀</span>
+                    <span class="btn-glow"></span>
+                  </button>
+                </form>
+
+                <div class="demo-bypass-box">
+                  <span>أو استكشف مركز العمليات مباشرة:</span>
+                  <button type="button" class="btn-demo-link" id="useDemoData">
+                    استعراض البيانات التجريبية (Demo Mode) ➔
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============================================================
+           VIEW 2: RAQUIB OPERATIONS & CONTROL CENTER DASHBOARD
+           ============================================================ -->
+      <div id="controlCenterView" class="view dashboard-view">
+        <div class="container-fluid dashboard-container">
+          
+          <!-- Top Dashboard Command Bar -->
+          <div class="dashboard-command-bar">
+            <div class="dashboard-brand-zone">
+              <div class="pulse-beacon-live"></div>
+              <div>
+                <h2 class="dash-title">مركز القيادة والعمليات اللوجستية | RAQUIB MISSION CONTROL</h2>
+                <div class="dash-subtitle">
+                  <span>الموقع: مستودع أ (الرياض)</span> • 
+                  <span class="status-pill-emerald">الربط السحابي نشط (Cloudflare D1 Edge)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dashboard-user-actions">
+              <div class="connected-user-pill" id="dashboardUserPill">
+                <span class="user-avatar-badge">👨‍💼</span>
+                <div class="user-info-text">
+                  <strong id="dashUserName">محمد العتيبي</strong>
+                  <span id="dashUserRole">مسؤول العمليات (USR-101)</span>
+                </div>
+              </div>
+
+              <button class="btn-tactical btn-tactical-glass btn-sm" id="btnBackToHome" type="button">
+                <span>🏠 الرئيسية</span>
+              </button>
+
+              <button class="btn-tactical btn-tactical-danger-outline btn-sm" id="btnDashLogout" type="button">
+                <span>تسجيل الخروج</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Dashboard Workspace Layout -->
+          <div class="dashboard-workspace-grid">
+            
+            <!-- Tactical Sidebar Menu -->
+            <aside class="dashboard-sidebar">
+              <div class="sidebar-section-title">الوحدات التشغيلية</div>
+              <nav class="sidebar-nav">
+                <button class="side-nav-item active" data-target-section="kpiAndOverview">
+                  <span class="nav-icon">📊</span>
+                  <span>نظرة عامة والمؤشرات</span>
+                </button>
+                <button class="side-nav-item" data-target-section="escalationTrackerSection">
+                  <span class="nav-icon">🚨</span>
+                  <span>تصعيد الحوادث الحية</span>
+                  <span class="nav-badge-danger">Active</span>
+                </button>
+                <button class="side-nav-item" data-target-section="qualityAuditSection">
+                  <span class="nav-icon">🛡️</span>
+                  <span>تدقيق الجودة والفسح</span>
+                </button>
+                <button class="side-nav-item" data-target-section="liveMapSection">
+                  <span class="nav-icon">🗺️</span>
+                  <span>الرادار وتتبع الأسطول</span>
+                  <span class="nav-badge-cyan">GPS</span>
+                </button>
+                <button class="side-nav-item" data-target-section="sensorsSection">
+                  <span class="nav-icon">📡</span>
+                  <span>شبكة حساسات الرفوف</span>
+                </button>
+                <button class="side-nav-item" data-target-section="deviceHealthSection">
+                  <span class="nav-icon">🔋</span>
+                  <span>صحة العتاد والصيانة</span>
+                  <span class="nav-badge-cyan">Fleet</span>
+                </button>
+                <button class="side-nav-item" data-target-section="alertsSection">
+                  <span class="nav-icon">⚡</span>
+                  <span>جدول تسوية التنبيهات</span>
+                  <span class="nav-badge-warn" id="sidebarAlertCount">1</span>
+                </button>
+                <button class="side-nav-item" data-target-section="diagnosticsSection">
+                  <span class="nav-icon">⚙️</span>
+                  <span>التشخيص الفني والـ API</span>
+                </button>
+              </nav>
+
+              <div class="sidebar-telemetry-status-card">
+                <div class="status-card-header">
+                  <span class="status-led led-green"></span>
+                  <strong>حالة الاتصال المباشر</strong>
+                </div>
+                <div class="status-details">
+                  <div><span>زمن الاستجابة:</span> <strong class="tabular-mono text-emerald" id="edgeLatency">18ms</strong></div>
+                  <div><span>تزامن قاعدة البيانات:</span> <strong class="text-cyan">D1 Synced</strong></div>
+                  <div><span>آخر تحديث:</span> <strong class="tabular-mono text-white" id="dashLastSyncTime">الآن</strong></div>
+                </div>
+                <button class="btn-tactical btn-tactical-glass btn-block btn-sm" id="btnRefreshDashboard" type="button" style="margin-top: 10px;">
+                  <span>🔄 تحديث البيانات الحية</span>
+                </button>
               </div>
             </aside>
-          </div>
-        </section>
 
-        <section class="section section-anchor solutions-section" id="solutions">
-          <div class="container">
-            <div class="section-title section-title-stack">
-              <div>
-                <span class="section-kicker">الخدمات والتأجير</span>
-                <h2>حلول تشغيلية وعتاد مراقبة جاهز للنشر</h2>
-                <p>من مراقبة المخزون الحساس إلى تأجير العتاد الذكي، توفر Raquib مسارات تنفيذ واضحة لفرق التشغيل وسلاسل التبريد.</p>
-              </div>
-
-              <div class="solution-tabs" role="tablist" aria-label="Solution categories">
-                <button class="solution-tab active" type="button" data-solution-tab="services" aria-selected="true">الخدمات</button>
-                <button class="solution-tab" type="button" data-solution-tab="rental" aria-selected="false">التأجير</button>
-              </div>
-            </div>
-
-            <div class="solution-panel active" data-solution-panel="services" role="tabpanel">
-              <div class="solution-grid">
-                <article class="solution-card">
-                  <div class="solution-icon teal">01</div>
-                  <h3>مراقبة فورية للمخزون الحساس</h3>
-                  <p>عرض موحد لحركة المنتجات المبردة داخل المستودعات والمركبات مع رؤية تشغيلية لحظية لفرق المتابعة.</p>
-                </article>
-                <article class="solution-card">
-                  <div class="solution-icon purple">02</div>
-                  <h3>تقارير آلية للامتثال</h3>
-                  <p>تقارير منظمة لقطاعي الأدوية والغذاء تساعد على توثيق الحالة التشغيلية وتسهيل المراجعة والاعتماد.</p>
-                </article>
-                <article class="solution-card">
-                  <div class="solution-icon navy">03</div>
-                  <h3>تنبيهات فورية للمخاطر</h3>
-                  <p>إشعارات فورية عند اكتشاف أي تجاوزات حرارية أو بيئية مع أولوية واضحة للمخاطر المؤثرة على الجودة.</p>
-                </article>
-              </div>
-            </div>
-
-            <div class="solution-panel" data-solution-panel="rental" role="tabpanel">
-              <div class="rental-grid">
-                <article class="rental-card featured">
-                  <div class="rental-head">
-                    <span class="rental-pill">الأكثر طلبًا</span>
-                    <h3>Smart Barcode Scanner</h3>
+            <!-- Main Content Area -->
+            <div class="dashboard-main-canvas">
+              
+              <!-- 1. Real-Time Operational KPI Ribbon -->
+              <section class="kpi-ribbon-grid" id="kpiAndOverview">
+                <div class="kpi-cyber-card card-glow-purple">
+                  <div class="kpi-card-header">
+                    <span class="kpi-label">إجمالي الشحنات المراقبة</span>
+                    <span class="kpi-icon">📦</span>
                   </div>
-                  <p>قارئ باركود ذكي للاستلام والتسليم والتتبع التشغيلي داخل المستودعات ونقاط الحركة.</p>
-                  <div class="rental-price">ابتداءً من 450 ر.س <span>/ شهر</span></div>
-                </article>
-                <article class="rental-card">
-                  <div class="rental-head">
-                    <span class="rental-pill rental-pill-teal">مراقبة بيئية</span>
-                    <h3>Temperature / Humidity Gateway</h3>
-                  </div>
-                  <p>بوابة حساسات مخصصة للقراءة البيئية المستمرة داخل النقل المبرد والمخازن الحسة.</p>
-                  <div class="rental-price">ابتداءً من 780 ر.س <span>/ شهر</span></div>
-                </article>
-                <article class="rental-card">
-                  <div class="rental-head">
-                    <span class="rental-pill rental-pill-purple">حزمة تشغيل</span>
-                    <h3>Cold Chain Monitoring Kit</h3>
-                  </div>
-                  <p>حزمة كاملة تشمل وحدات التتبع والقراءة البيئية ولوحة ربط جاهزة لفرق اللوجستيات.</p>
-                  <div class="rental-price">ابتداءً من 1,250 ر.س <span>/ شهر</span></div>
-                </article>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Registration / Auth Zone -->
-        <section class="section section-anchor auth-section" id="authSection">
-          <div class="container">
-            <div class="section-title section-title-stack">
-              <div>
-                <span class="section-kicker">المصادقة والتسجيل</span>
-                <h2>مركز مصادقة الموظفين والوصول السريع</h2>
-                <p>قم بتسجيل الدخول ببركود الموظف أو المسح السريع بالهاتف للاتصال للنظام الحي ومتابعة الشحنات وتسوية التنبيهات.</p>
-              </div>
-            </div>
-
-            <div id="loginPanel" class="login-panel-container">
-              <div class="login-card">
-                <h3>تسجيل الدخول لمركز العمليات</h3>
-                
-                <div class="login-tabs">
-                  <button class="login-tab-btn active" id="tabBarcodeBtn" type="button">رمز الموظف</button>
-                  <button class="login-tab-btn" id="tabQrBtn" type="button">الدخول السريع بالهاتف</button>
-                </div>
-
-                <div id="tabBarcodeContent" class="login-tab-content active">
-                  <p>أدخل رمز الموظف (Barcode) الخاص بك للاتصال بالنظام الحي ومتابعة الشحنات وتسوية التنبيهات.</p>
-                  <form id="loginForm">
-                    <div class="form-group">
-                      <label for="employeeBarcode" style="display: block; margin-bottom: 8px; font-weight: bold;">رمز الموظف (مثال: EMP-101)</label>
-                      <input type="text" id="employeeBarcode" class="form-input" placeholder="EMP-101" required style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--stroke); background: white; font-size: 1rem; color: var(--primary);" />
-                    </div>
-                    <div id="loginError" class="login-error" style="display: none; color: var(--danger); margin-top: 10px; font-size: 0.9rem; font-weight: 500;">رمز الموظف غير صحيح، يرجى المحاولة مرة أخرى.</div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px; justify-content: center;">تسجيل الدخول للبيانات الحية</button>
-                  </form>
-                </div>
-
-                <div id="tabQrContent" class="login-tab-content">
-                  <p>افتح تطبيق رقيب على هاتفك، انتقل لشاشة المسح (Scan)، وامسح كود الـ QR أدناه لتسجيل الدخول فوراً.</p>
-                  <div class="qr-pairing-box">
-                    <div id="qrLoadingSpinner" class="qr-spinner">
-                      <div class="spinner-ring"></div>
-                      <span>جاري توليد الرمز...</span>
-                    </div>
-                    <img id="pairingQrImg" class="pairing-qr-img" src="" alt="Pairing QR Code" style="display: none;" />
-                    <div id="qrExpiredMsg" class="qr-expired-msg" style="display: none;">
-                      <span>انتهت صلاحية الرمز</span>
-                      <button class="btn btn-ghost" id="refreshPairingQrBtn" type="button" style="margin-top: 8px; border: 1px solid var(--accent); padding: 6px 12px; font-size: 0.85rem;">تحديث الكود</button>
-                    </div>
-                  </div>
-                  <div class="qr-pairing-status" id="qrPairingStatus">
-                    <span class="status-indicator-dot dot-pulse"></span>
-                    <span id="qrStatusText">بانتظار المسح من الهاتف...</span>
-                  </div>
-                  <div id="qrCountdownContainer" style="margin-top: 14px; text-align: center; font-size: 0.95rem; font-weight: bold; color: var(--accent); display: none;">
-                    تنتهي صلاحية الكود خلال: <span id="qrCountdown">05:00</span>
+                  <div class="kpi-val tabular-mono" id="dashTotalShipments">128</div>
+                  <div class="kpi-footer-status text-muted">
+                    <span>حركة سلاسل التبريد عبر كافة المستودعات</span>
                   </div>
                 </div>
 
-                <div class="login-demo-notice" style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--muted);">
-                  أو يمكنك استكشاف <a href="#" id="useDemoData" style="color: var(--accent); font-weight: bold; text-decoration: underline;">البيانات التجريبية</a> مباشرة.
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="download-section section-anchor" id="downloadAppSection">
-          <div class="container">
-            <div class="download-card-glass">
-              <div class="download-info">
-                <span class="badge-accent">تطبيق الهاتف / Mobile App</span>
-                <h2>حمّل تطبيق رقيب للتشغيل الميداني</h2>
-                <p>
-                  تابع شحناتك البيئية وحل التنبيهات الحرجة مباشرة من الميدان. يتميز التطبيق بمسح سريع للباركود، تنبيهات فورية، ودعم كامل للغتين العربية والإنجليزية.
-                </p>
-                <div class="download-actions">
-                  <a href="https://expo.dev/artifacts/eas/Gh02Zgj9vIanIFRf4WYwy9UChjLPdNyJVlQ-uxuocQE.apk" class="btn btn-primary btn-sky-neon">
-                    <span>📥</span> تنزيل ملف الـ APK للأندرويد
-                  </a>
-                  <a href="https://expo.dev/accounts/kmg001/projects/raquib-app/builds/c88403f0-5d8a-4ef6-9b4f-679253f70610" target="_blank" class="btn btn-ghost" style="color: white; border: 1px solid rgba(255, 255, 255, 0.2);">
-                    <span>⚙️</span> تفاصيل البناء على Expo
-                  </a>
-                </div>
-              </div>
-              <div class="download-qr">
-                <h5>امسح للتثبيت المباشر</h5>
-                <div class="qr-glow-wrapper">
-                  <div class="qr-install-box-glass">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=0f172a&data=https://expo.dev/artifacts/eas/Gh02Zgj9vIanIFRf4WYwy9UChjLPdNyJVlQ-uxuocQE.apk" alt="APK QR Code" />
+                <div class="kpi-cyber-card card-glow-crimson">
+                  <div class="kpi-card-header">
+                    <span class="kpi-label">التنبيهات الحرجة المفتوحة</span>
+                    <span class="kpi-icon-pulse">🚨</span>
+                  </div>
+                  <div class="kpi-val tabular-mono text-crimson" id="dashActiveAlerts">01</div>
+                  <div class="kpi-footer-status text-crimson">
+                    <span>تجاوز حراري نشط يتطلب تدخل فوري</span>
                   </div>
                 </div>
-                <p class="qr-hint-text">يدعم أجهزة الأندرويد 8.0 فما فوق</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </section>
 
-      <!-- Control Center View -->
-      <section id="controlCenterView" class="view dashboard-view">
-        <div class="container">
-          <div class="dashboard-head">
-            <div>
-              <div class="eyebrow">مركز العمليات</div>
-              <h2>لوحة التحكم التشغيلية - Raquib Control Center</h2>
-            </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <button class="btn btn-ghost" id="backToHome" type="button">الرئيسية</button>
-              <button class="btn btn-ghost" id="logoutBtn" type="button" style="display: none; background: rgba(239, 68, 68, 0.1); color: #EF4444; font-weight: bold; border-radius: 12px; padding: 10px 14px;">تسجيل الخروج</button>
-            </div>
-          </div>
-
-          <div id="dashboardContent" style="display: block;">
-            <div class="dashboard-layout">
-              <aside class="sidebar">
-                <h3>Raquib Control Center</h3>
-                <div class="side-links">
-                  <a class="active" href="#" id="sideLinkOverview">نظرة عامة</a>
-                  <a href="#" id="sideLinkEscalation">تصعيد التنبيهات 🚨</a>
-                  <a href="#" id="sideLinkQuality">تدقيق الجودة والفسح 🛡️</a>
-                  <a href="#" id="sideLinkShipments">الشحنات النشطة</a>
-                  <a href="#" id="sideLinkAlerts">جدول التنبيهات</a>
-                  <a href="#" id="sideLinkSettings">الإعدادات الفنية</a>
-                  <a href="#downloadApp" id="openDownloadModalSidebar" style="color: var(--accent); font-weight: bold;">تنزيل التطبيق 📱</a>
+                <div class="kpi-cyber-card card-glow-emerald">
+                  <div class="kpi-card-header">
+                    <span class="kpi-label">الشحنات الآمنة المستقرة</span>
+                    <span class="kpi-icon">🛡️</span>
+                  </div>
+                  <div class="kpi-val tabular-mono text-emerald" id="dashSafeShipments">127</div>
+                  <div class="kpi-footer-status text-emerald">
+                    <span>99.2% سلامة متوافقة مع معايير SFDA</span>
+                  </div>
                 </div>
-                <div id="workerProfileCard" style="margin-top: 24px; padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: none;">
-                  <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px;">الموظف المتصل:</div>
-                  <div id="connectedWorkerName" style="font-weight: bold; font-size: 1rem; color: white;">-</div>
-                  <div id="connectedWorkerRole" style="font-size: 0.8rem; color: var(--accent); margin-top: 2px;">-</div>
+
+                <div class="kpi-cyber-card card-glow-cyan">
+                  <div class="kpi-card-header">
+                    <span class="kpi-label">حساسات الرفوف المتصلة</span>
+                    <span class="kpi-icon">📡</span>
+                  </div>
+                  <div class="kpi-val tabular-mono text-cyan" id="dashConnectedSensors">24</div>
+                  <div class="kpi-footer-status text-cyan">
+                    <span>تغطية بنسبة 100% لمنطقة أ، ب، ج</span>
+                  </div>
                 </div>
-              </aside>
+              </section>
 
-              <div class="dashboard-main">
-                <!-- 1. Dynamic 4-Level Alert Escalation Timeline Tracker -->
-                <section class="dashboard-card escalation-card" id="escalationTrackerSection" style="margin-bottom: 24px;">
-                  <div class="escalation-header">
-                    <div>
-                      <div class="badge-tag tag-rose">
-                        <span class="pulse-dot bg-rose"></span>
-                        <span>تتبع تصعيد التنبيهات الحية</span>
-                      </div>
-                      <h3 className="section-title">مؤشر التصعيد التراكمي للحوادث الحرارية <span class="sub-id">(INC-8842 - الشحنة #RQ-1002)</span></h3>
+              <!-- 2. Dynamic 4-Level Alert Escalation Timeline Tracker -->
+              <section class="dashboard-module-card" id="escalationTrackerSection">
+                <div class="module-card-header">
+                  <div class="header-titles">
+                    <div class="badge-tag-crimson">
+                      <span class="pulse-dot-crimson"></span>
+                      <span>محرك تتبع التصعيد الهرمي للحوادث الحرارية</span>
                     </div>
-                    <div class="live-ticker-box">
-                      <div class="ticker-info">
-                        <span class="ticker-label">الزمن المنقضي للتجاوز</span>
-                        <span class="ticker-value" id="escalationLiveTimer">07:42</span>
-                      </div>
-                      <button type="button" class="btn-icon-pause" id="toggleEscalationTimerBtn" title="إيقاف / استئناف مؤقت المؤشر">⏸</button>
+                    <h3 class="module-title">مؤشر التصعيد التراكمي للحوادث <span class="incident-id-tag">(INC-8842 // الشحنة #RQ-1002)</span></h3>
+                  </div>
+
+                  <div class="live-ticker-cyber-box">
+                    <div class="ticker-content">
+                      <span class="ticker-label">الزمن المنقضي للتجاوز الحراري:</span>
+                      <strong class="ticker-value tabular-mono" id="escalationLiveTimer">07:42</strong>
+                    </div>
+                    <button type="button" class="btn-tactical btn-tactical-glass btn-sm" id="toggleEscalationTimerBtn" title="إيقاف / استئناف المؤقت">
+                      <span id="timerPausePlayIcon">⏸</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 4 Escalation Stage Nodes -->
+                <div class="escalation-nodes-grid">
+                  <!-- Level 1 -->
+                  <div class="escalation-node-card node-passed" data-level="1">
+                    <div class="node-top">
+                      <span class="node-icon">🚨</span>
+                      <span class="node-status-badge badge-passed">تم التصعيد ✓</span>
+                    </div>
+                    <div class="node-body">
+                      <h4>المستوى الأول (فوري)</h4>
+                      <div class="node-time tabular-mono">00:00 - 05:00 د</div>
+                    </div>
+                    <div class="node-footer">
+                      <span class="footer-lbl">جهات الإشعار:</span>
+                      <span class="footer-recipients">السائق + مسؤول المستودع الميداني</span>
                     </div>
                   </div>
 
-                  <div class="escalation-grid" id="escalationNodesGrid">
-                    <!-- Level 1 -->
-                    <div class="escalation-node node-passed" data-level="1">
-                      <div class="node-top">
-                        <span class="node-icon">🚨</span>
-                        <span class="node-badge badge-passed">تم التصعيد ✓</span>
-                      </div>
-                      <div class="node-body">
-                        <h4>المستوى الأول (فوري)</h4>
-                        <div class="node-time">00:00 - 05:00 د</div>
-                      </div>
-                      <div class="node-footer">
-                        <span class="footer-label">جهات الإشعارات:</span>
-                        <span class="footer-target">السائق + مدير الأسطول + مسؤول الجودة</span>
-                      </div>
+                  <!-- Level 2 -->
+                  <div class="escalation-node-card node-active" data-level="2">
+                    <div class="node-top">
+                      <span class="node-icon">⚠️</span>
+                      <span class="node-status-badge badge-active animate-pulse">نشط الآن (Active)</span>
                     </div>
-
-                    <!-- Level 2 -->
-                    <div class="escalation-node node-active" data-level="2">
-                      <div class="node-top">
-                        <span class="node-icon">⚠️</span>
-                        <span class="node-badge badge-active animate-pulse">نشط الآن (Active)</span>
-                      </div>
-                      <div class="node-body">
-                        <h4>المستوى الثاني (+5 دقائق)</h4>
-                        <div class="node-time">+5 دقائق</div>
-                      </div>
-                      <div class="node-footer">
-                        <span class="footer-label">جهات الإشعارات:</span>
-                        <span class="footer-target highlight-rose">مدير العمليات اللوجستية</span>
-                      </div>
+                    <div class="node-body">
+                      <h4>المستوى الثاني (+5 دقائق)</h4>
+                      <div class="node-time tabular-mono">+5 دقائق تجاوز</div>
                     </div>
-
-                    <!-- Level 3 -->
-                    <div class="escalation-node node-pending" data-level="3">
-                      <div class="node-top">
-                        <span class="node-icon">⚡</span>
-                        <span class="node-badge badge-pending">قادم (+15د)</span>
-                      </div>
-                      <div class="node-body">
-                        <h4>المستوى الثالث (+15 دقيقة)</h4>
-                        <div class="node-time">+15 دقيقة</div>
-                      </div>
-                      <div class="node-footer">
-                        <span class="footer-label">جهات الإشعارات:</span>
-                        <span class="footer-target">مدير عام الجودة وسلاسل التبريد</span>
-                      </div>
-                    </div>
-
-                    <!-- Level 4 -->
-                    <div class="escalation-node node-pending" data-level="4">
-                      <div class="node-top">
-                        <span class="node-icon">📞</span>
-                        <span class="node-badge badge-pending">قادم (+30د)</span>
-                      </div>
-                      <div class="node-body">
-                        <h4>المستوى الرابع (+30 دقيقة)</h4>
-                        <div class="node-time">+30 دقيقة</div>
-                      </div>
-                      <div class="node-footer">
-                        <span class="footer-label">جهات الإشعارات:</span>
-                        <span class="footer-target">اتصال آلي ذكي + SMS للطوارئ (الخريطة المستقبلية)</span>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- 2. Quality Policy & Decision Recommendation Module -->
-                <section class="dashboard-card quality-audit-card" id="qualityAuditSection" style="margin-bottom: 24px;">
-                  <div class="quality-header">
-                    <div>
-                      <div class="badge-tag tag-sky">
-                        <span class="pulse-dot bg-sky"></span>
-                        <span>وحدة تدقيق الجودة والاعتماد الفني</span>
-                      </div>
-                      <h3>سياسة الجودة وتوصية الفسح النهائي <span class="sub-id">(#RQ-1002)</span></h3>
-                    </div>
-                    <div id="qualityAutomatedBadge" class="quality-badge badge-amber">
-                      <span class="dot dot-amber"></span>
-                      <span id="qualityBadgeText">مقبول مع ملاحظة تنبيه</span>
+                    <div class="node-footer">
+                      <span class="footer-lbl">جهات الإشعار:</span>
+                      <span class="footer-recipients text-amber">مدير العمليات والأسطول اللوجستي</span>
                     </div>
                   </div>
 
-                  <!-- 8px Grid adherence metrics -->
-                  <div class="metrics-grid-8px">
-                    <div class="metric-box">
-                      <span class="metric-lbl">الحرارة المستهدفة</span>
-                      <div class="metric-val text-white" id="qaTargetTemp">-18<span class="unit">°C</span></div>
+                  <!-- Level 3 -->
+                  <div class="escalation-node-card node-pending" data-level="3">
+                    <div class="node-top">
+                      <span class="node-icon">⚡</span>
+                      <span class="node-status-badge badge-pending">قادم (+15د)</span>
                     </div>
-                    <div class="metric-box">
-                      <span class="metric-lbl">الحد الأقصى المسموح</span>
-                      <div class="metric-val text-amber" id="qaMaxAllowedTemp">-15<span class="unit">°C</span></div>
+                    <div class="node-body">
+                      <h4>المستوى الثالث (+15 دقيقة)</h4>
+                      <div class="node-time tabular-mono">+15 دقيقة تجاوز</div>
                     </div>
-                    <div class="metric-box">
-                      <span class="metric-lbl">سياسة التجاوز الزمني</span>
-                      <div class="metric-val text-slate" id="qaMaxPolicyMins">15<span class="unit"> دقيقة</span></div>
-                    </div>
-                    <div class="metric-box">
-                      <span class="metric-lbl">أعلى حرارة مسجلة</span>
-                      <div class="metric-val text-rose" id="qaActualMaxTemp">-14<span class="unit">°C</span></div>
-                    </div>
-                    <div class="metric-box">
-                      <span class="metric-lbl">مدّة التجاوز الفعلية</span>
-                      <div class="metric-val text-sky" id="qaActualDurationMins">10<span class="unit"> دقيقة</span></div>
+                    <div class="node-footer">
+                      <span class="footer-lbl">جهات الإشعار:</span>
+                      <span class="footer-recipients text-muted">مدير عام سلاسل التبريد والجودة</span>
                     </div>
                   </div>
 
-                  <!-- Recommendation Banner -->
-                  <div class="recommendation-banner" id="qaRecommendationBanner">
-                    <div class="rec-icon">🛡️</div>
-                    <div class="rec-content">
-                      <h4>التوصية الآلية للجودة:</h4>
-                      <p id="qaRecommendationText">حدث تجاوز حراري طفيف لا يتعدى مهلة السياسة المحددة (10 دقائق &le; 15 دقيقة). الشحنة سليمة وتشغيلية مع التوثيق المعتمد.</p>
+                  <!-- Level 4 -->
+                  <div class="escalation-node-card node-pending" data-level="4">
+                    <div class="node-top">
+                      <span class="node-icon">📞</span>
+                      <span class="node-status-badge badge-pending">قادم (+30د)</span>
+                    </div>
+                    <div class="node-body">
+                      <h4>المستوى الرابع (+30 دقيقة)</h4>
+                      <div class="node-time tabular-mono">+30 دقيقة تجاوز</div>
+                    </div>
+                    <div class="node-footer">
+                      <span class="footer-lbl">جهات الإشعار:</span>
+                      <span class="footer-recipients text-muted">نداء طوارئ آلي + حظر الفسح التلقائي</span>
                     </div>
                   </div>
+                </div>
+              </section>
 
-                  <!-- Quality Officer Approval Form -->
-                  <form id="qualityApprovalForm" class="quality-form">
-                    <div class="form-row">
-                      <div class="form-field">
-                        <label for="qaOfficerName">اسم مسؤول الجودة</label>
-                        <input type="text" id="qaOfficerName" value="أحمد محمد - مدير الجودة" required class="input-dark" />
-                      </div>
-                      <div class="form-field">
-                        <label for="qaTimestamp">التوقيت والتاريخ التلقائي</label>
-                        <input type="text" id="qaTimestamp" readonly class="input-dark readonly" />
-                      </div>
+              <!-- 3. Quality Policy & Decision Recommendation Module -->
+              <section class="dashboard-module-card" id="qualityAuditSection">
+                <div class="module-card-header">
+                  <div class="header-titles">
+                    <div class="badge-tag-cyan">
+                      <span class="pulse-dot-cyan"></span>
+                      <span>وحدة تدقيق الجودة والفسح والاعتماد الفني</span>
                     </div>
+                    <h3 class="module-title">سياسة الجودة وتوصية الفسح النهائي <span class="incident-id-tag">(الشحنة #RQ-1002)</span></h3>
+                  </div>
 
+                  <div class="quality-automated-badge badge-amber" id="qaAutomatedBadge">
+                    <span class="dot-amber"></span>
+                    <span id="qaBadgeText">مقبول مع ملاحظة توثيق</span>
+                  </div>
+                </div>
+
+                <!-- 8px Grid adherence metrics -->
+                <div class="quality-metrics-grid">
+                  <div class="q-metric-box">
+                    <span class="q-lbl">الحرارة المستهدفة</span>
+                    <div class="q-val text-white tabular-mono" id="qaTargetTemp">-18<span class="unit">°C</span></div>
+                  </div>
+                  <div class="q-metric-box">
+                    <span class="q-lbl">الحد الأقصى المسموح</span>
+                    <div class="q-val text-amber tabular-mono" id="qaMaxAllowedTemp">-15<span class="unit">°C</span></div>
+                  </div>
+                  <div class="q-metric-box">
+                    <span class="q-lbl">سياسة التجاوز الزمني</span>
+                    <div class="q-val text-cyan tabular-mono" id="qaMaxPolicyMins">15<span class="unit"> دقيقة</span></div>
+                  </div>
+                  <div class="q-metric-box">
+                    <span class="q-lbl">أعلى حرارة مسجلة</span>
+                    <div class="q-val text-crimson tabular-mono" id="qaActualMaxTemp">-14<span class="unit">°C</span></div>
+                  </div>
+                  <div class="q-metric-box">
+                    <span class="q-lbl">مدّة التجاوز الفعلية</span>
+                    <div class="q-val text-emerald tabular-mono" id="qaActualDurationMins">10<span class="unit"> دقائق</span></div>
+                  </div>
+                </div>
+
+                <!-- Automated Recommendation Banner -->
+                <div class="qa-recommendation-banner" id="qaRecommendationBanner">
+                  <div class="rec-icon">🛡️</div>
+                  <div class="rec-content">
+                    <h4 class="rec-title">التوصية الآلية لنظام رقيب:</h4>
+                    <p class="rec-text" id="qaRecommendationText">
+                      حدث انحراف حراري طفيف لا يتعدى مهلة السياسة المحددة (10 دقائق &le; 15 دقيقة المعتمدة). الشحنة سليمة وتشغيلية مع التوثيق المعتمد.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Quality Officer Approval Sign-off Form -->
+                <form id="qualityApprovalForm" class="quality-approval-form">
+                  <div class="form-row-2col">
                     <div class="form-field">
-                      <label for="qaDecisionReason">سبب القرار وتبرير الفسح</label>
-                      <select id="qaDecisionReason" class="select-dark">
-                        <option value="تجاوز حراري طفيف ضمن مهلة السياسة المعتمدة (أقل من 15 دقيقة)">تجاوز حراري طفيف ضمن مهلة السياسة المعتمدة (أقل من 15 دقيقة)</option>
-                        <option value="تغير طفيف في الحرارة أثناء تفريغ وشحن البضاعة">تغير طفيف في الحرارة أثناء تفريغ وشحن البضاعة</option>
-                        <option value="تم تأكيد سلامة العينات بالتدقيق اليدوي في الحاوية">تم تأكيد سلامة العينات بالتدقيق اليدوي في الحاوية</option>
-                        <option value="تجاوز الحد المسموح به - تم رفض الشحنة وحظر الفسح">تجاوز الحد المسموح به - تم رفض الشحنة وحظر الفسح</option>
-                        <option value="custom">سبب مخصص...</option>
-                      </select>
-                      <textarea id="qaCustomReason" placeholder="اكتب التبرير الفني بالتفصيل..." class="textarea-dark" style="display: none; margin-top: 8px;"></textarea>
+                      <label for="qaOfficerName">اسم مسؤول الجودة والاعتماد</label>
+                      <input type="text" id="qaOfficerName" value="أحمد محمد - مدير الجودة وسلاسل التبريد" required class="form-input-cyber" />
                     </div>
-
-                    <div id="qaSuccessAlert" class="alert-success-box" style="display: none;">
-                      <span>✓ تم تسجيل واعتماد قرار الجودة وإصدار التقرير الرسمي بنجاح.</span>
-                    </div>
-
-                    <div class="form-actions">
-                      <button type="submit" id="qaSubmitBtn" class="btn-sky-action">
-                        <span id="qaBtnSpinner" class="btn-spinner" style="display: none;"></span>
-                        <span id="qaBtnText">اعتماد القرار وإصدار التقرير الرسمي 🛡️</span>
-                      </button>
-                    </div>
-                  </form>
-                </section>
-
-                <section class="kpi-ribbon" id="kpiSection" aria-label="Summary KPIs">
-                  <article class="kpi-card border-purple">
-                    <h4>إجمالي الشحنات</h4>
-                    <div class="metric-value" id="kpiTotalShipments">128</div>
-                    <p class="metric-desc">تتبع إجمالي الحركة التشغيلية عبر العملاء والمناطق المختلفة.</p>
-                  </article>
-                  <article class="kpi-card border-red">
-                    <h4>التنبيهات النشطة</h4>
-                    <div class="metric-value" id="kpiActiveAlerts">03</div>
-                    <p class="metric-desc">تنبيهات حرجة تحتاج مراجعة فورية من فريق العمليات.</p>
-                  </article>
-                  <article class="kpi-card border-teal">
-                    <h4>الشحنات الآمنة</h4>
-                    <div class="metric-value" id="kpiSafeShipments">121</div>
-                    <p class="metric-desc">الشحنات التي بقيت ضمن الحدود الحرارية والتشغيلية المسموح بها.</p>
-                  </article>
-                </section>
-
-                <!-- Live Interactive Map Section with Collapsible Shipment Detail Drawer -->
-                <section class="dashboard-card live-map-card" id="liveMapSection" style="margin-bottom: 24px; position: relative; overflow: hidden;">
-                  <div class="monitor-head">
-                    <div>
-                      <h3 style="margin:0 0 4px; color: white;">الخريطة المباشرة وتتبع الأسطول (Live Map & Fleet Tracking)</h3>
-                      <p class="fine-print" style="margin:0; color: #94A3B8;">مراقبة لحظية لمسارات الشاحنات وحالات التبريد على الطريق.</p>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                      <button type="button" id="toggleShipmentDrawerBtn" class="btn-drawer-toggle">
-                        <span>📋 تفاصيل الشحنة (RQ-1002)</span>
-                        <span id="drawerToggleIcon">▼</span>
-                      </button>
-                      <span class="status-pill pill-live">GPS Signal Active</span>
+                    <div class="form-field">
+                      <label for="qaTimestamp">التوقيت والتاريخ التلقائي</label>
+                      <input type="text" id="qaTimestamp" readonly class="form-input-cyber input-readonly" />
                     </div>
                   </div>
 
-                  <!-- Map Visualizer Layer -->
-                  <div class="map-visualizer-container" style="position: relative; width: 100%; height: 320px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                    <!-- SVG Map Routes Visualizer -->
-                    <svg viewBox="0 0 800 320" style="width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(14, 165, 233, 0.1));">
-                      <path d="M 100,220 Q 250,100 400,160 T 700,80" fill="none" stroke="#0EA5E9" stroke-width="3" stroke-dasharray="6 4" />
-                      <circle cx="100" cy="220" r="7" fill="#10B981" />
-                      <circle cx="250" cy="130" r="7" fill="#10B981" />
-                      <circle cx="400" cy="160" r="9" fill="#F59E0B" class="animate-pulse" />
-                      <circle cx="550" cy="120" r="9" fill="#EF4444" class="animate-bounce" />
-                      <circle cx="700" cy="80" r="7" fill="#10B981" />
-                      <!-- Route Labels -->
-                      <text x="90" y="245" fill="#94A3B8" font-size="11" font-family="sans-serif">RQ-1001 (جازان)</text>
-                      <text x="375" y="190" fill="#FBBF24" font-size="11" font-weight="bold" font-family="sans-serif">RQ-1002 (أبو عريش)</text>
-                      <text x="530" y="100" fill="#F87171" font-size="11" font-weight="bold" font-family="sans-serif">RQ-1004 (تنبيه حراري)</text>
+                  <div class="form-field" style="margin-top: 16px;">
+                    <label for="qaDecisionReason">سبب وتبرير الفسح الفني</label>
+                    <select id="qaDecisionReason" class="form-select-cyber">
+                      <option value="تجاوز حراري طفيف ضمن مهلة السياسة المعتمدة (أقل من 15 دقيقة)">تجاوز حراري طفيف ضمن مهلة السياسة المعتمدة (أقل من 15 دقيقة)</option>
+                      <option value="تغير طفيف في الحرارة أثناء تفريغ وشحن البضاعة">تغير طفيف في الحرارة أثناء تفريغ وشحن البضاعة</option>
+                      <option value="تم تأكيد سلامة العينات بالتدقيق اليدوي في الحاوية">تم تأكيد سلامة العينات بالتدقيق اليدوي في الحاوية</option>
+                      <option value="تجاوز الحد المسموح به - تم رفض الشحنة وحظر الفسح">تجاوز الحد المسموح به - تم رفض الشحنة وحظر الفسح</option>
+                      <option value="custom">تبرير فني مخصص...</option>
+                    </select>
+                    <textarea id="qaCustomReason" placeholder="اكتب التبرير الفني بالتفصيل..." class="form-textarea-cyber" style="display: none; margin-top: 10px;"></textarea>
+                  </div>
+
+                  <div id="qaSuccessAlert" class="qa-success-alert" style="display: none;">
+                    <span class="success-icon">✓</span>
+                    <span>تم تسجيل واعتماد قرار الجودة وإصدار شهادة المطابقة الرسمية بنجاح.</span>
+                  </div>
+
+                  <div class="form-actions-right" style="margin-top: 20px;">
+                    <button type="submit" id="qaSubmitBtn" class="btn-tactical btn-tactical-primary btn-lg">
+                      <span id="qaBtnSpinner" class="btn-spinner" style="display: none;"></span>
+                      <span id="qaBtnText">اعتماد القرار وإصدار التقرير الرسمي 🛡️</span>
+                      <span class="btn-glow"></span>
+                    </button>
+                  </div>
+                </form>
+              </section>
+
+              <!-- 4. Live Interactive GIS Tactical Map & Fleet Radar Section -->
+              <section class="dashboard-module-card" id="liveMapSection">
+                <div class="module-card-header">
+                  <div class="header-titles">
+                    <h3 class="module-title">الرادار التكتيكي وتتبع الأسطول اللوجستي (Live GIS Fleet Radar)</h3>
+                    <p class="module-subtitle">مراقبة لحظية لمسارات الشاحنات وحالات التبريد على الطرق السريعة.</p>
+                  </div>
+                  <div class="map-header-actions">
+                    <button type="button" id="toggleShipmentDrawerBtn" class="btn-tactical btn-tactical-glass btn-sm">
+                      <span>📋 فحص تفاصيل الشاحنة (RQ-1002)</span>
+                      <span id="drawerToggleIcon">▼</span>
+                    </button>
+                    <span class="status-pill-emerald">GPS Signal Active</span>
+                  </div>
+                </div>
+
+                <!-- Real Leaflet GIS Map Container -->
+                <div class="map-visualizer-frame" style="height: 520px; position: relative;">
+                  <div id="gisLiveMap" style="width: 100%; height: 100%; z-index: 1;"></div>
+
+                  <!-- Real-time Controls Overlay -->
+                  <div class="map-quick-controls" style="position: absolute; bottom: 16px; right: 16px; z-index: 1000; display: flex; gap: 8px;">
+                    <button type="button" class="btn-tactical btn-tactical-glass btn-sm" id="btnRecenterSaudiMap">
+                      <span>🇸🇦 نظرة شاملة (المملكة)</span>
+                    </button>
+                    <button type="button" class="btn-tactical btn-tactical-primary btn-sm" id="btnFollowTruck1002">
+                      <span>🚚 تتبع شاحنة RQ-1002 المباشرة</span>
+                    </button>
+                  </div>
+
+                  <!-- Non-obscuring Collapsible Inspection Drawer -->
+                  <div id="shipmentDetailDrawer" class="shipment-drawer-floating" style="z-index: 1000;">
+                    <div class="drawer-head">
+                      <strong id="drawerTruckTitle">تفاصيل الشاحنة #RQ-1002</strong>
+                      <span class="badge-tag-amber" id="drawerStatusBadge">في الطريق (In Transit)</span>
+                    </div>
+                    <div class="drawer-body">
+                      <div class="drawer-item"><span>السائق:</span><strong class="text-white" id="drawerDriverName">أحمد السعيد</strong></div>
+                      <div class="drawer-item"><span>درجة الحرارة:</span><strong class="text-amber tabular-mono" id="drawerTemp">6.2°C (تجاوز طفيف)</strong></div>
+                      <div class="drawer-item"><span>الرطوبة النسبية:</span><strong class="text-white tabular-mono" id="drawerHumidity">48%</strong></div>
+                      <div class="drawer-item"><span>حالة قفل الباب:</span><strong class="text-emerald" id="drawerDoorStatus">🔒 مغلق بإحكام</strong></div>
+                      <div class="drawer-item"><span>السرعة الحالية:</span><strong class="text-white tabular-mono" id="drawerSpeed">65 كم/س</strong></div>
+                      <div class="drawer-item"><span>الموقع الجغرافي:</span><strong class="text-cyan" id="drawerLocation">طريق جازان - عسير السريع</strong></div>
+                      <div class="drawer-item"><span>إحداثيات GPS:</span><strong class="text-white tabular-mono" id="drawerGpsCoords">17.0500° N, 42.8600° E</strong></div>
+                      <div class="drawer-item"><span>توقيت الوصول المتوقع (ETA):</span><strong class="text-cyan tabular-mono" id="drawerEta">14:35 (مستودع الرياض)</strong></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 5. Warehouse Shelves & Sensor Telemetry Matrix -->
+              <section class="dashboard-module-card" id="sensorsSection">
+                <div class="module-card-header">
+                  <div class="header-titles">
+                    <h3 class="module-title">مصفوفة حساسات الرفوف والمستودع اللحظية</h3>
+                    <p class="module-subtitle">تتبع مستمر لقراءات الحساسات المثبتة على الرفوف وحاويات التخزين.</p>
+                  </div>
+                  <span class="badge-tag-emerald">24 Sensornodes Online</span>
+                </div>
+
+                <div class="sensors-cards-row">
+                  <div class="sensor-live-card card-safe">
+                    <div class="s-card-top">
+                      <h4>حساس الحرارة (Temperature)</h4>
+                      <span class="badge-tag-emerald">Safe / آمن</span>
+                    </div>
+                    <div class="s-card-val tabular-mono" id="dashTempSensorVal">4.0°C</div>
+                    <p class="s-card-desc">حافظة التبريد في الرف B-3 ضمن النطاق المثالي لنقل الأدوية.</p>
+                  </div>
+
+                  <div class="sensor-live-card card-safe">
+                    <div class="s-card-top">
+                      <h4>حساس الرطوبة (Humidity)</h4>
+                      <span class="badge-tag-cyan">Stable / مستقر</span>
+                    </div>
+                    <div class="s-card-val tabular-mono" id="dashHumSensorVal">45%</div>
+                    <p class="s-card-desc">توازن رطوبة مناسب يمنع تكون أي تكاثف على العبوات.</p>
+                  </div>
+
+                  <div class="sensor-live-card card-safe">
+                    <div class="s-card-top">
+                      <h4>الاهتزاز والصدمات (Shock)</h4>
+                      <span class="badge-tag-emerald">0.0G / سكون تام</span>
+                    </div>
+                    <div class="s-card-val tabular-mono" id="dashVibSensorVal">0.02 G</div>
+                    <p class="s-card-desc">لا توجد أي صدمات مقلقة على هيكل الرفوف أو حاويات الشحن.</p>
+                  </div>
+                </div>
+
+                <!-- Temperature Waveform Trend Chart -->
+                <div class="temperature-trend-box">
+                  <div class="trend-header">
+                    <div>
+                      <h4>منحنى تذبذب درجات الحرارة (24-Hour Trend Wave)</h4>
+                      <span class="text-muted">معدل التغير الحراري خلال الساعات الـ 12 الماضية</span>
+                    </div>
+                    <div class="trend-stats">
+                      <span>القراءة الحالية: <strong class="text-emerald tabular-mono">4.2°C</strong></span> • 
+                      <span>المدى: <strong class="text-white tabular-mono">3.8° - 4.6°C</strong></span>
+                    </div>
+                  </div>
+
+                  <div class="chart-canvas-wrapper">
+                    <svg viewBox="0 0 960 220" class="trend-chart-svg" id="dashTempSvgChart">
+                      <!-- Grid horizontal guides -->
+                      <line x1="0" y1="40" x2="960" y2="40" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4" />
+                      <line x1="0" y1="110" x2="960" y2="110" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4" />
+                      <line x1="0" y1="180" x2="960" y2="180" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4" />
+
+                      <!-- Temperature Wave Path -->
+                      <path d="M 0,110 Q 80,70 160,115 T 320,105 T 480,95 T 640,120 T 800,105 L 960,110" fill="none" stroke="#00F0FF" stroke-width="3" />
+                      
+                      <!-- Area Fill under curve -->
+                      <path d="M 0,110 Q 80,70 160,115 T 320,105 T 480,95 T 640,120 T 800,105 L 960,110 L 960,220 L 0,220 Z" fill="url(#waveAreaGrad)" opacity="0.15" />
+
+                      <defs>
+                        <linearGradient id="waveAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stop-color="#00F0FF" />
+                          <stop offset="100%" stop-color="transparent" />
+                        </linearGradient>
+                      </defs>
+
+                      <!-- Key points -->
+                      <circle cx="160" cy="115" r="5" fill="#00F0FF" />
+                      <circle cx="480" cy="95" r="5" fill="#00FF66" />
+                      <circle cx="800" cy="105" r="6" fill="#00FF66" class="map-node-pulse" />
                     </svg>
+                  </div>
+                </div>
+              </section>
 
-                    <!-- Non-obscuring Collapsible Side Drawer Component -->
-                    <div id="shipmentDetailDrawer" class="shipment-drawer-collapsed" style="position: absolute; top: 16px; left: 16px; max-width: 320px; background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 12px; padding: 16px; backdrop-filter: blur(16px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 20; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
-                      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); padding-bottom: 8px;">
-                        <span style="font-size: 0.85rem; font-weight: bold; color: white;">تفاصيل الشحنة #RQ-1002</span>
-                        <span class="badge-active" style="padding: 2px 8px; font-size: 0.7rem;">في الطريق</span>
-                      </div>
-                      <div id="drawerContent" className="space-y-2" style="font-size: 0.8rem; color: #CBD5E1; line-height: 1.6;">
-                        <div style="display: flex; justify-content: space-between;"><span>السائق:</span><strong style="color: white;">أحمد السعيد</strong></div>
-                        <div style="display: flex; justify-content: space-between;"><span>درجة الحرارة:</span><strong style="color: #F87171;">6.2°C (تجاوز)</strong></div>
-                        <div style="display: flex; justify-content: space-between;"><span>الرطوبة النسبية:</span><strong style="color: white;">48%</strong></div>
-                        <div style="display: flex; justify-content: space-between;"><span>حالة الباب:</span><strong style="color: #34D399;">مغلق</strong></div>
-                        <div style="display: flex; justify-content: space-between;"><span>السرعة الحالية:</span><strong style="color: white;">65 كم/س</strong></div>
-                        <div style="display: flex; justify-content: space-between;"><span>الموقع:</span><strong style="color: white;">جازان - أبو عريش</strong></div>
-                        <div style="display: flex; justify-content: space-between;"><span>ETA المتوقع:</span><strong style="color: #38BDF8;">14:35</strong></div>
-                      </div>
-                    </div>
+              <!-- Device Fleet Health & Predictive Maintenance Module -->
+              <section class="dashboard-module-card" id="deviceHealthSection">
+                <div class="module-card-header">
+                  <div class="header-titles">
+                    <h3 class="module-title">صحة العتاد والصيانة الاستباقية (Device Fleet Health & Diagnostics)</h3>
+                    <p class="module-subtitle">مراقبة حية لمستوى البطاريات، جودة الإشارة (RSSI)، نبضات الاتصال (Heartbeat)، وجداول المعايرة المعتمدة.</p>
                   </div>
-                </section>
+                  <div class="header-badges-wrap">
+                    <span class="status-pill-emerald" id="fleetOnlineBadge">24/24 Online</span>
+                    <span class="badge-tag-cyan">Hardware Watchdog</span>
+                  </div>
+                </div>
 
-                <section class="dashboard-card" id="sensorsSection">
-                  <div class="monitor-head">
-                    <div>
-                      <span class="shipment-tag" id="activeShipmentTag">الشحنة النشطة الحالية: #RQ-000125</span>
+                <!-- KPI Health Matrix Ribbon -->
+                <div class="device-health-kpi-grid">
+                  <div class="health-kpi-card">
+                    <div class="health-kpi-icon icon-emerald">🔋</div>
+                    <div class="health-kpi-content">
+                      <span class="health-kpi-label">متوسط طاقة البطاريات</span>
+                      <strong class="health-kpi-val text-emerald" id="avgBatteryDisplay">89%</strong>
+                      <span class="health-kpi-sub">كافة الأجهزة فوق مستوى الأمان</span>
                     </div>
-                    <span class="status-pill pill-live">Monitoring Live</span>
                   </div>
 
-                  <div class="cards-grid">
-                    <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
-                      <div class="card-title">
-                        <h4>Temperature Sensor</h4>
-                        <span class="chip chip-green" id="tempStatusChip">Safe / آمن</span>
-                      </div>
-                      <div class="sensor-value" id="tempValue">4°C</div>
-                      <div class="fine-print">حافظة التبريد ضمن النطاق المثالي لنقل المنتجات الحساسة.</div>
-                    </article>
+                  <div class="health-kpi-card">
+                    <div class="health-kpi-icon icon-cyan">📶</div>
+                    <div class="health-kpi-content">
+                      <span class="health-kpi-label">جودة التغطية والاتصال</span>
+                      <strong class="health-kpi-val text-cyan">-67 dBm</strong>
+                      <span class="health-kpi-sub">شبكة 4G IoT فائقة الاستقرار</span>
+                    </div>
+                  </div>
 
-                    <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
-                      <div class="card-title">
-                        <h4>Humidity Sensor</h4>
-                        <span class="chip chip-teal" id="humidityStatusChip">Stable</span>
-                      </div>
-                      <div class="sensor-value" id="humidityValue">45%</div>
-                      <div class="fine-print">توازن رطوبة مناسب لتقليل أي أثر سلبي على العبوات والمنتجات المبردة.</div>
-                    </article>
+                  <div class="health-kpi-card">
+                    <div class="health-kpi-icon icon-warn">⚠️</div>
+                    <div class="health-kpi-content">
+                      <span class="health-kpi-label">تنبيهات انخفاض الطاقة</span>
+                      <strong class="health-kpi-val text-warn" id="lowBatCountDisplay">جهاز 1 (18%)</strong>
+                      <span class="health-kpi-sub text-warn">رف B-12 بحاجة تبديل بطارية</span>
+                    </div>
+                  </div>
 
-                    <article class="dashboard-card" style="box-shadow:none; min-height:auto;">
-                      <div class="card-title">
-                        <h4>Vibration / Shock</h4>
-                        <span class="chip chip-gray" id="vibrationStatusChip">Structural Safety</span>
-                      </div>
-                      <div class="sensor-value" id="vibrationValue">مستقر (0G)</div>
-                      <div class="fine-print">لا توجد صدمات مقلقة على هيكل الشحنة أو حاوية النقل حتى الآن.</div>
-                    </article>
+                  <div class="health-kpi-card">
+                    <div class="health-kpi-icon icon-purple">🛡️</div>
+                    <div class="health-kpi-content">
+                      <span class="health-kpi-label">مطابقة معايرة SFDA</span>
+                      <strong class="health-kpi-val text-purple">100% معتمد</strong>
+                      <span class="health-kpi-sub">سارية المفعول حتى Q4 2026</span>
+                    </div>
                   </div>
-                </section>
+                </div>
 
-                <!-- Alerts Section -->
-                <section class="dashboard-card" id="alertsSection" style="margin-top: 24px;">
-                  <div class="monitor-head">
-                    <div>
-                      <h3>التنبيهات النشطة والتسوية (Active Alerts & Resolution)</h3>
-                      <p class="fine-print">الحالات الحرجة الحالية في المستودع وخطوات العمل المطلوبة لتسويتها.</p>
-                    </div>
-                    <span class="status-pill pill-live" id="alertsLiveBadge">Live Alert System</span>
+                <!-- Device Filter Tabs -->
+                <div class="device-health-controls">
+                  <div class="health-filter-tabs">
+                    <button class="health-tab-btn active" data-fleet-filter="all">كافة الأجهزة (24)</button>
+                    <button class="health-tab-btn" data-fleet-filter="trackers">أجهزة تتبع الشاحنات (GPS)</button>
+                    <button class="health-tab-btn" data-fleet-filter="nodes">حساسات الرفوف (Nodes)</button>
+                    <button class="health-tab-btn" data-fleet-filter="gateways">بوابات التغطية (Gateways)</button>
                   </div>
-                  <div id="alertsList" class="alerts-list" style="margin-top: 20px;">
-                    <!-- Dynamic alerts will be inserted here -->
-                    <div class="no-alerts-msg">
-                      لا توجد تنبيهات نشطة حالياً. كل الأنظمة مستقرة.
-                    </div>
+                  <div class="health-quick-actions">
+                    <button type="button" class="btn-tactical btn-tactical-cyan" id="btnPingAllDevices">
+                      <span>🔄 فحص اتصال كافة الأجهزة (Ping Fleet)</span>
+                    </button>
                   </div>
-                </section>
+                </div>
 
-                <section class="chart-card" id="trendSection" style="margin-top: 24px;">
-                  <div class="monitor-head">
-                    <div>
-                      <h3>Temperature Trend</h3>
-                      <p class="fine-print">يعرض تغير الحرارة عبر الوقت ويبرز آخر قراءة بوضوح.</p>
-                    </div>
-                    <span class="status-pill pill-purple">جاهزية التحليل الذكي</span>
-                  </div>
-                  <div class="chart-wrap" aria-label="Temperature fluctuation chart">
-                    <div class="chart-summary">
-                      <div class="chart-stat">
-                        <span>القراءة الحالية</span>
-                        <strong id="chartCurrentValue">4°C</strong>
-                      </div>
-                      <div class="chart-stat">
-                        <span>المدى</span>
-                        <strong>3.8° - 4.6°C</strong>
-                      </div>
-                      <div class="chart-stat">
-                        <span>الحالة</span>
-                        <strong class="chart-safe">Stable</strong>
-                      </div>
-                    </div>
-                    <div class="chart-frame">
-                      <svg id="tempChart" class="temperature-chart" viewBox="0 0 960 360" role="img" aria-label="Temperature line chart"></svg>
-                      <div class="chart-tooltip" id="chartTooltip" hidden></div>
-                    </div>
-                    <div class="chart-legend">
-                      <span><i class="legend-dot legend-line"></i>منحنى الحرارة</span>
-                      <span><i class="legend-dot legend-fill"></i>نطاق التشغيل</span>
-                      <span><i class="legend-dot legend-current"></i>آخر قراءة</span>
-                    </div>
-                  </div>
-                </section>
+                <!-- Devices Live Health Table -->
+                <div class="device-fleet-table-wrap">
+                  <table class="device-fleet-table" id="deviceFleetTable">
+                    <thead>
+                      <tr>
+                        <th>معرّف العتاد / النوع</th>
+                        <th>الأصل المرتبط / الموقع</th>
+                        <th>مستوى البطارية والفولتية</th>
+                        <th>جودة الإشارة والـ GPS</th>
+                        <th>آخر نبضة (Heartbeat)</th>
+                        <th>صلاحية المعايرة</th>
+                        <th>الحالة والإجراء</th>
+                      </tr>
+                    </thead>
+                    <tbody id="deviceFleetTableBody">
+                      <!-- Row 1: Vehicle Tracker -->
+                      <tr data-device-type="trackers">
+                        <td>
+                          <div class="device-cell-id">
+                            <span class="device-icon">🚛</span>
+                            <div>
+                              <strong class="tabular-mono text-cyan">RQ-TRACKER-1002</strong>
+                              <span class="device-type-label">4G LTE & GPS Cold Tracker</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="device-assigned-asset">
+                            <strong>شاحنة النقل المبرد (أبو عريش - عسير)</strong>
+                            <span class="text-muted">السائق: أحمد السعيد // شحنة SHP-902</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="battery-cell">
+                            <div class="battery-meter-bar">
+                              <div class="battery-fill battery-fill-green" style="width: 94%;"></div>
+                            </div>
+                            <span class="battery-text tabular-mono"><strong>94%</strong> (4.12V)</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="signal-cell">
+                            <div class="signal-bars bars-4">
+                              <span></span><span></span><span></span><span></span>
+                            </div>
+                            <span class="signal-text tabular-mono">-68 dBm • 11 أقمار</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="heartbeat-cell">
+                            <span class="pulse-dot-green"></span>
+                            <span class="heartbeat-text">متصل الآن (منذ 4ث)</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="badge-tag-emerald">صالحة حتى 15/12/2026</span>
+                        </td>
+                        <td>
+                          <div class="table-actions-cell">
+                            <button type="button" class="btn-micro btn-micro-cyan" onclick="pingSingleDevice('RQ-TRACKER-1002')">Ping</button>
+                          </div>
+                        </td>
+                      </tr>
 
-                <!-- Technical Settings Section -->
-                <section class="dashboard-card" id="settingsSection" style="margin-top: 24px; display: none;">
-                  <div class="monitor-head">
-                    <div>
-                      <h3 style="margin:0 0 8px;">الإعدادات الفنية والتشخيص (Technical Settings)</h3>
-                      <p class="fine-print" style="margin:0;">عرض حالة الاتصال بالخادم، إعدادات الـ API، والتشخيص التشغيلي للنظام.</p>
+                      <!-- Row 2: Secondary Vehicle Tracker -->
+                      <tr data-device-type="trackers">
+                        <td>
+                          <div class="device-cell-id">
+                            <span class="device-icon">🚚</span>
+                            <div>
+                              <strong class="tabular-mono text-cyan">RQ-TRACKER-1001</strong>
+                              <span class="device-type-label">4G LTE Tracker Unit</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="device-assigned-asset">
+                            <strong>شاحنة إمداد ميناء جازان</strong>
+                            <span class="text-muted">السائق: خالد الشهري // شحنة مصل الدم</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="battery-cell">
+                            <div class="battery-meter-bar">
+                              <div class="battery-fill battery-fill-green" style="width: 88%;"></div>
+                            </div>
+                            <span class="battery-text tabular-mono"><strong>88%</strong> (4.05V)</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="signal-cell">
+                            <div class="signal-bars bars-4">
+                              <span></span><span></span><span></span><span></span>
+                            </div>
+                            <span class="signal-text tabular-mono">-72 dBm • 9 أقمار</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="heartbeat-cell">
+                            <span class="pulse-dot-green"></span>
+                            <span class="heartbeat-text">منذ 58 ثانية</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="badge-tag-emerald">صالحة حتى 20/11/2026</span>
+                        </td>
+                        <td>
+                          <div class="table-actions-cell">
+                            <button type="button" class="btn-micro btn-micro-cyan" onclick="pingSingleDevice('RQ-TRACKER-1001')">Ping</button>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <!-- Row 3: Shelf Node Sensor with Low Battery Alert -->
+                      <tr data-device-type="nodes" class="row-warning-highlight">
+                        <td>
+                          <div class="device-cell-id">
+                            <span class="device-icon">📡</span>
+                            <div>
+                              <strong class="tabular-mono text-warn">RQ-NODE-08</strong>
+                              <span class="device-type-label">Precision Cold-Chain Node</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="device-assigned-asset">
+                            <strong class="text-warn">رف الأدوية الحساسة B-12</strong>
+                            <span class="text-muted">مستودع أ - وحدة التبريد الأولى</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="battery-cell">
+                            <div class="battery-meter-bar">
+                              <div class="battery-fill battery-fill-red" style="width: 18%;"></div>
+                            </div>
+                            <span class="battery-text tabular-mono text-crimson"><strong>18%</strong> (3.42V ⚠️)</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="signal-cell">
+                            <div class="signal-bars bars-2">
+                              <span></span><span></span>
+                            </div>
+                            <span class="signal-text tabular-mono">-85 dBm (داخلي)</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="heartbeat-cell">
+                            <span class="pulse-dot-amber"></span>
+                            <span class="heartbeat-text">منذ 15 ثانية</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="badge-tag-emerald">صالحة حتى 01/10/2026</span>
+                        </td>
+                        <td>
+                          <div class="table-actions-cell">
+                            <button type="button" class="btn-micro btn-micro-warn" onclick="requestBatterySwap('RQ-NODE-08')">طلب صيانة</button>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <!-- Row 4: Industrial Edge Gateway -->
+                      <tr data-device-type="gateways">
+                        <td>
+                          <div class="device-cell-id">
+                            <span class="device-icon">🎛️</span>
+                            <div>
+                              <strong class="tabular-mono text-cyan">RQ-GATEWAY-01</strong>
+                              <span class="device-type-label">Industrial Multi-Channel Hub</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="device-assigned-asset">
+                            <strong>بوابة التغطية الرئيسية (المستودع المركزي)</strong>
+                            <span class="text-muted">تغطي 60 رفاً + شبكة Mesh</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="battery-cell">
+                            <span class="badge-tag-cyan">⚡ تغذية كهربائية رئيسية (12V)</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="signal-cell">
+                            <div class="signal-bars bars-4">
+                              <span></span><span></span><span></span><span></span>
+                            </div>
+                            <span class="signal-text tabular-mono">-55 dBm • Gigabit Fiber</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="heartbeat-cell">
+                            <span class="pulse-dot-green"></span>
+                            <span class="heartbeat-text">نشط ومستمر (0ث)</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="badge-tag-emerald">صالحة حتى 10/01/2027</span>
+                        </td>
+                        <td>
+                          <div class="table-actions-cell">
+                            <button type="button" class="btn-micro btn-micro-cyan" onclick="pingSingleDevice('RQ-GATEWAY-01')">Ping</button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Direct Ingestion Test & Integration Card -->
+                <div class="hardware-integration-console">
+                  <div class="console-header">
+                    <div class="console-title-wrap">
+                      <span class="status-led led-green"></span>
+                      <h4>منفذ استقبال التيليمتري المباشر (Direct Hardware Ingestion Endpoint)</h4>
                     </div>
-                    <span class="status-pill pill-live">System Diagnostic</span>
+                    <span class="badge-tag-cyan">HTTP POST Ready</span>
                   </div>
-                  <div class="settings-grid" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-                    <div class="settings-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--stroke); padding: 18px; border-radius: 16px;">
-                      <h5 style="margin:0 0 10px; color: var(--primary); font-size: 1rem;">حالة الاتصال بالـ Backend</h5>
-                      <p style="margin:0 0 8px; font-size: 0.9rem; color: var(--muted);">Endpoint: <code id="settingsApiUrl" style="color: var(--accent);">https://raquib-api.alghzwanyk7.workers.dev</code></p>
-                      <span class="status-pill pill-live" style="background: rgba(16,185,129,0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.2); font-weight: bold;">متصل بالخادم الحي / Connected</span>
+
+                  <div class="console-body">
+                    <div class="console-info-row">
+                      <span class="console-label">رابط السيرفر للاستقبال (API Endpoint):</span>
+                      <code class="console-url" id="ingestEndpointDisplay">https://raquib-api.alghzwanyk7.workers.dev/api/telemetry/ingest</code>
+                      <button type="button" class="btn-micro btn-micro-cyan" id="btnCopyIngestUrl">نسخ الرابط</button>
                     </div>
-                    <div class="settings-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--stroke); padding: 18px; border-radius: 16px;">
-                      <h5 style="margin:0 0 10px; color: var(--primary); font-size: 1rem;">تفاصيل الجلسة النشطة</h5>
-                      <p style="margin:0 0 6px; font-size: 0.9rem; color: var(--muted);">نوع المصادقة: <strong style="color: var(--primary);">JWT Bearer</strong></p>
-                      <p style="margin:0 0 6px; font-size: 0.9rem; color: var(--muted);">صلاحية الجلسة: <strong style="color: var(--success);">نشطة (Active)</strong></p>
-                      <p style="margin:0; font-size: 0.9rem; color: var(--muted);">التخزين المحلي: <strong style="color: var(--primary);">LocalStorage Enabled</strong></p>
+
+                    <div class="console-actions-bar">
+                      <div class="console-instructions">
+                        💡 بمجرد إرسال جهازكم القراءة إلى الرابط أعلاه، سيتم تحديث درجات الحرارة والموقع وصحة البطارية في لوحة التحكم لحظياً.
+                      </div>
+                      <button type="button" class="btn-tactical btn-tactical-success-glow" id="btnSimulateHardwarePacket">
+                        <span>📡 محاكاة إرسال قراءة من الجهاز الفعلي</span>
+                        <span class="btn-glow"></span>
+                      </button>
+                    </div>
+
+                    <!-- Ingestion Output Console Log -->
+                    <div class="ingest-response-log" id="ingestResponseLog" style="display: none;">
+                      <div class="log-title">استجابة السيرفر المباشرة (Server Response 200 OK):</div>
+                      <pre class="log-code" id="ingestResponseJson"></pre>
                     </div>
                   </div>
-                </section>
-              </div>
+                </div>
+
+              </section>
+
+              <!-- 6. Active Alerts & Action Steps Resolver -->
+              <section class="dashboard-module-card" id="alertsSection">
+                <div class="module-card-header">
+                  <div class="header-titles">
+                    <h3 class="module-title">التنبيهات النشطة وخطوات التدخل الفوري (Active Alerts & Resolution)</h3>
+                    <p class="module-subtitle">الحالات الحرجة الحالية في المستودع وخطوات العمل المطلوبة لتسويتها من الخادم الحي.</p>
+                  </div>
+                  <span class="status-pill-crimson" id="alertsLiveBadge">Live Alert Engine</span>
+                </div>
+
+                <div class="alerts-dynamic-list" id="alertsListContainer">
+                  <!-- Dynamic alert cards populated via API / Demo -->
+                  <div class="alert-item-card card-critical" id="alertCard-ALT-2026-0647">
+                    <div class="alert-item-header">
+                      <div class="alert-title-wrap">
+                        <span class="alert-badge-danger">تنبيه حرج • Critical</span>
+                        <h4>تجاوز حراري في رف B-12 // إنسولين هيومولين</h4>
+                      </div>
+                      <div class="alert-temp-reading tabular-mono text-crimson">11.2°C</div>
+                    </div>
+
+                    <div class="alert-meta-details">
+                      <div><span>معرّف التنبيه:</span> <strong class="tabular-mono">ALT-2026-0647</strong></div>
+                      <div><span>الشحنة:</span> <strong class="tabular-mono">SHP-2026-441</strong></div>
+                      <div><span>الموقع:</span> <strong>مستودع أ - منطقة ب (الرف B-12)</strong></div>
+                      <div><span>النطاق الآمن المسموح:</span> <strong class="tabular-mono">2.0°C - 8.0°C</strong></div>
+                    </div>
+
+                    <div class="alert-steps-box">
+                      <h5>خطوات التدخل الإجرائية المطلوبة:</h5>
+                      <ol class="action-steps-ordered">
+                        <li>توجّه إلى رف <strong>B-12</strong> في منطقة ب.</li>
+                        <li>انقل الشحنة إلى وحدة التبريد الاحتياطية <strong>C-2</strong>.</li>
+                        <li>سيتم تحديث النظام تلقائياً وتأكيد التسوية فور إكمال النقل.</li>
+                      </ol>
+                    </div>
+
+                    <div class="alert-actions-footer">
+                      <button type="button" class="btn-tactical btn-tactical-success-glow btn-lg" id="btnResolveAlertALT">
+                        <span>✓ تأكيد نقل الشحنة وتسوية التنبيه</span>
+                        <span class="btn-glow"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 7. Technical Diagnostics & API Endpoint Configuration -->
+              <section class="dashboard-module-card" id="diagnosticsSection" style="margin-bottom: 40px;">
+                <div class="module-card-header">
+                  <div class="header-titles">
+                    <h3 class="module-title">التشخيص الفني وإعدادات الـ API (System Diagnostics)</h3>
+                    <p class="module-subtitle">حالة الاتصال بالخادم، الـ JWT Bearer Token، ومعلومات جلسة العمل الحالية.</p>
+                  </div>
+                  <span class="badge-tag-cyan">Edge Telemetry v2.0</span>
+                </div>
+
+                <div class="diagnostics-grid">
+                  <div class="diag-card">
+                    <h5>خادم الـ API السحابي (Cloudflare Worker)</h5>
+                    <p>Endpoint: <code class="text-cyan">https://raquib-api.alghzwanyk7.workers.dev</code></p>
+                    <div class="diag-status-row">
+                      <span class="status-dot-emerald"></span>
+                      <strong class="text-emerald">متصل بالخادم الحي (HTTP 200 OK)</strong>
+                    </div>
+                  </div>
+
+                  <div class="diag-card">
+                    <h5>جلسة المصادقة والمشرف</h5>
+                    <p>نوع التوثيق: <strong class="text-white">JWT Bearer Token</strong></p>
+                    <p>صلاحية الجلسة: <strong class="text-emerald">نشطة وموثقة (Active Session)</strong></p>
+                  </div>
+                </div>
+              </section>
+
             </div>
           </div>
+
         </div>
-      </section>
+      </div>
     </main>
-  </div>
 
-  <!-- App Companion Modal -->
-  <div id="appCompanionModal" class="modal-backdrop">
-    <div class="modal-card">
-      <button class="modal-close-btn" id="closeAppModalBtn" aria-label="Close modal">&times;</button>
-      <div class="modal-header">
-        <img src="logo.png" alt="Raquib Logo" width="56" height="56" style="border-radius: 14px; box-shadow: var(--shadow);" />
-        <div>
-          <h3>تطبيق رقيب للهاتف المحمول</h3>
-          <p class="subtitle">المراقبة البيئية الفورية وحل التنبيهات في جيبك</p>
+    <!-- Global Cyber Footer -->
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <div class="brand">
+            <img class="brand-logo" src="logo.png" alt="رقيب" width="36" height="36" />
+            <span class="brand-title">رَقِـيـب | RAQUIB</span>
+          </div>
+          <p class="footer-desc">
+            المنصة الذكية الرائدة لمراقبة سلاسل الإمداد المبردة والتتبع اللوجستي الفوري للمنشآت والمستودعات.
+          </p>
         </div>
-      </div>
-      <div class="modal-body-grid">
-        <div class="modal-info-column">
-          <h4>مميزات التطبيق:</h4>
-          <ul class="features-list">
-            <li><span>👁️</span> تتبع الحساسات في المخزن وحالة الشحنات مباشرة.</li>
-            <li><span>⚡</span> استقبال إشعارات فورية بالحالات الطارئة والحرجة.</li>
-            <li><span>📸</span> مسح الباركود باستخدام كاميرا الهاتف لحل التنبيهات وربط الشحنات.</li>
-            <li><span>🌐</span> دعم كامل للغتين العربية والإنجليزية مع وضع ليلي.</li>
-          </ul>
-          <div class="modal-actions" style="margin-top: 24px;">
-            <a href="https://expo.dev/artifacts/eas/Gh02Zgj9vIanIFRf4WYwy9UChjLPdNyJVlQ-uxuocQE.apk" class="btn btn-primary" style="text-decoration: none; display: inline-flex; justify-content: center; gap: 8px;">
-              <span>📥</span> تحميل ملف الـ APK للأندرويد
-            </a>
+
+        <div class="footer-links-group">
+          <div class="footer-col">
+            <h5>روابط سريعة</h5>
+            <ul>
+              <li><a href="#home" id="footerHomeLink">الرئيسية</a></li>
+              <li><a href="#features" id="footerFeaturesLink">المميزات والمعمارية</a></li>
+              <li><a href="#hardware" id="footerHardwareLink">العتاد والتأجير</a></li>
+              <li><a href="#standards" id="footerStandardsLink">معايير الامتثال</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h5>الأنظمة والخدمات</h5>
+            <ul>
+              <li><a href="#controlCenter" id="footerDashboardLink">مركز العمليات الحي</a></li>
+              <li><a href="https://raquib-api.alghzwanyk7.workers.dev" target="_blank" rel="noopener noreferrer">حالة الـ API السحابي</a></li>
+            </ul>
           </div>
         </div>
-        <div class="modal-qr-column">
-          <h5>امسح لتنزيل التطبيق فوراً</h5>
-          <div class="qr-install-box">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=0f172a&data=https://expo.dev/artifacts/eas/Gh02Zgj9vIanIFRf4WYwy9UChjLPdNyJVlQ-uxuocQE.apk" alt="APK QR Code" />
-          </div>
-          <p class="qr-hint">امسح الكود بكاميرا هاتفك لبدء التثبيت مباشرة.</p>
+      </div>
+
+      <div class="container footer-bottom">
+        <div class="copyright">
+          © 2026 رَقِـيـب (RAQUIB Telemetry Systems) • جميع الحقوق محفوظة
+        </div>
+        <div class="system-status-indicator">
+          <span class="status-dot-emerald"></span>
+          <span>الخوادم السحابية تعمل بكفاءة 100%</span>
         </div>
       </div>
-    </div>
+    </footer>
   </div>
 
+  <!-- Leaflet GIS Real Map Library JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Main Logic & Interactivity Script -->
   <script src="script.js" defer></script>
 </body>
 </html>
