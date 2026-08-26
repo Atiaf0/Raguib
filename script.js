@@ -1857,6 +1857,63 @@ window.requestBatterySwap = function(deviceId) {
 };
 
 // ------------------------------------------------------------------
+// Mobile Navigation Drawer System
+// ------------------------------------------------------------------
+function initMobileMenu() {
+  const toggleBtn = getEl('mobileMenuToggle');
+  const navLinks = getEl('navLinks');
+  const backdrop = getEl('mobileNavBackdrop');
+
+  if (!toggleBtn || !navLinks) return;
+
+  function closeMenu() {
+    toggleBtn.classList.remove('active');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    navLinks.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function openMenu() {
+    toggleBtn.classList.add('active');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    navLinks.classList.add('open');
+    if (backdrop) backdrop.classList.add('active');
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = navLinks.classList.contains('open');
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', closeMenu);
+  }
+
+  // Close drawer when clicking any nav link or CTA inside it
+  navLinks.querySelectorAll('a, button').forEach(item => {
+    item.addEventListener('click', () => {
+      closeMenu();
+    });
+  });
+
+  // Auto-close on resize to desktop & invalidate GIS map layout
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 992 && navLinks.classList.contains('open')) {
+      closeMenu();
+    }
+    if (gisMap && typeof gisMap.invalidateSize === 'function') {
+      gisMap.invalidateSize();
+    }
+  });
+}
+
+// ------------------------------------------------------------------
 // Main Application Bootstrap
 // ------------------------------------------------------------------
 function initApp() {
