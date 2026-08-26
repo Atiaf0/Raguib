@@ -524,24 +524,60 @@ function initNavigationEvents() {
 }
 
 // ------------------------------------------------------------------
-// 2. Mobile Menu Navigation Toggle
+// 2. Mobile Navigation Drawer System
 // ------------------------------------------------------------------
 function initMobileMenu() {
-  const mobileMenuToggle = getEl('mobileMenuToggle');
+  const toggleBtn = getEl('mobileMenuToggle');
   const navLinks = getEl('navLinks');
+  const backdrop = getEl('mobileNavBackdrop');
 
-  if (!mobileMenuToggle || !navLinks) return;
+  if (!toggleBtn || !navLinks) return;
 
-  mobileMenuToggle.addEventListener('click', () => {
-    const isExpanded = navLinks.classList.toggle('mobile-open');
-    mobileMenuToggle.setAttribute('aria-expanded', String(isExpanded));
+  function closeMenu() {
+    toggleBtn.classList.remove('active');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    navLinks.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function openMenu() {
+    toggleBtn.classList.add('active');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    navLinks.classList.add('open');
+    if (backdrop) backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = navLinks.classList.contains('open');
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
   });
 
-  navLinks.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      navLinks.classList.remove('mobile-open');
-      mobileMenuToggle.setAttribute('aria-expanded', 'false');
+  if (backdrop) {
+    backdrop.addEventListener('click', closeMenu);
+  }
+
+  // Close drawer when clicking any nav link or CTA inside it
+  navLinks.querySelectorAll('a, button').forEach((item) => {
+    item.addEventListener('click', () => {
+      closeMenu();
     });
+  });
+
+  // Auto-close on resize to desktop & invalidate GIS map layout
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 992 && navLinks.classList.contains('open')) {
+      closeMenu();
+    }
+    if (gisMap && typeof gisMap.invalidateSize === 'function') {
+      gisMap.invalidateSize();
+    }
   });
 }
 
@@ -1856,62 +1892,7 @@ window.requestBatterySwap = function(deviceId) {
   showCyberToast(`تم فتح تذكرة صيانة فورية لتبديل بطارية الجهاز ${deviceId} لفريق المستودع.`, 'warn');
 };
 
-// ------------------------------------------------------------------
-// Mobile Navigation Drawer System
-// ------------------------------------------------------------------
-function initMobileMenu() {
-  const toggleBtn = getEl('mobileMenuToggle');
-  const navLinks = getEl('navLinks');
-  const backdrop = getEl('mobileNavBackdrop');
 
-  if (!toggleBtn || !navLinks) return;
-
-  function closeMenu() {
-    toggleBtn.classList.remove('active');
-    toggleBtn.setAttribute('aria-expanded', 'false');
-    navLinks.classList.remove('open');
-    if (backdrop) backdrop.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  function openMenu() {
-    toggleBtn.classList.add('active');
-    toggleBtn.setAttribute('aria-expanded', 'true');
-    navLinks.classList.add('open');
-    if (backdrop) backdrop.classList.add('active');
-  }
-
-  toggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = navLinks.classList.contains('open');
-    if (isOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  });
-
-  if (backdrop) {
-    backdrop.addEventListener('click', closeMenu);
-  }
-
-  // Close drawer when clicking any nav link or CTA inside it
-  navLinks.querySelectorAll('a, button').forEach(item => {
-    item.addEventListener('click', () => {
-      closeMenu();
-    });
-  });
-
-  // Auto-close on resize to desktop & invalidate GIS map layout
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 992 && navLinks.classList.contains('open')) {
-      closeMenu();
-    }
-    if (gisMap && typeof gisMap.invalidateSize === 'function') {
-      gisMap.invalidateSize();
-    }
-  });
-}
 
 // ------------------------------------------------------------------
 // Main Application Bootstrap
