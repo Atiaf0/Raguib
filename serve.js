@@ -1,9 +1,10 @@
+/* eslint-disable no-console */
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 
 const PORT = 5500;
-const ROOT = __dirname;
+const ROOT = path.resolve(__dirname);
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -22,17 +23,18 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-  const parsedUrl = new URL(req.url, `http://localhost:${PORT}`);
+  const parsedUrl = new URL(req.url || '/', `http://localhost:${PORT}`);
   let pathname = decodeURIComponent(parsedUrl.pathname);
   if (pathname === '/' || pathname === '') {
     pathname = '/index.html';
   }
 
-  const filePath = path.normalize(path.join(ROOT, pathname));
+  const filePath = path.resolve(ROOT, '.' + pathname);
 
   // Prevent directory traversal
   if (!filePath.startsWith(ROOT)) {
     res.statusCode = 403;
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.end('Access Denied');
     return;
   }
