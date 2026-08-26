@@ -95,6 +95,10 @@ body {
   z-index: 0;
   filter: blur(140px);
   opacity: 0.45;
+  contain: strict;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .glow-top-right {
